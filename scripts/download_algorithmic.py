@@ -17,22 +17,21 @@ sys.path.insert(0, str(ROOT))
 from arex_v2.data import download, extract_tar, extract_zip  # noqa: E402
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--repo", default="weiwch/Frontier-CS-Algo")
-    parser.add_argument("--ref", default="main")
-    parser.add_argument("--url", default="")
-    parser.add_argument("--archive", type=Path, default=ROOT / ".cache/frontier-cs-algo.tar.gz")
-    parser.add_argument("--sha256", default="")
-    parser.add_argument("--destination", type=Path, default=ROOT / "algorithmic")
-    ns = parser.parse_args()
-    url = ns.url or f"https://github.com/{ns.repo}/archive/refs/heads/{ns.ref}.tar.gz"
-    archive = ns.archive
+def download_algorithmic(
+    *,
+    repo: str = "weiwch/Frontier-CS-Algo",
+    ref: str = "main",
+    url: str = "",
+    archive: Path = ROOT / ".cache/frontier-cs-algo.tar.gz",
+    sha256: str = "",
+    destination: Path = ROOT / "algorithmic",
+) -> Path:
+    url = url or f"https://github.com/{repo}/archive/refs/heads/{ref}.tar.gz"
     if not archive.exists():
         print(f"downloading {url}")
-        download(url, archive, ns.sha256)
-    prefix = f"{ns.repo.split('/')[-1]}-{ns.ref}/algorithmic/problems/"
-    destination = ns.destination / "problems"
+        download(url, archive, sha256)
+    prefix = f"{repo.split('/')[-1]}-{ref}/algorithmic/problems/"
+    destination = destination / "problems"
     try:
         extract_tar(archive, destination, prefix=prefix)
     except tarfile.ReadError:
@@ -42,7 +41,27 @@ def main() -> None:
                 raise ValueError("archive does not contain algorithmic/problems")
             first = names[0].split("/algorithmic/problems/")[0] + "/algorithmic/problems/"
             extract_zip(archive, destination, prefix=first)
-    print(f"algorithmic problems ready at {ns.destination / 'problems'}")
+    print(f"algorithmic problems ready at {destination}")
+    return destination
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--repo", default="weiwch/Frontier-CS-Algo")
+    parser.add_argument("--ref", default="main")
+    parser.add_argument("--url", default="")
+    parser.add_argument("--archive", type=Path, default=ROOT / ".cache/frontier-cs-algo.tar.gz")
+    parser.add_argument("--sha256", default="")
+    parser.add_argument("--destination", type=Path, default=ROOT / "algorithmic")
+    ns = parser.parse_args()
+    download_algorithmic(
+        repo=ns.repo,
+        ref=ns.ref,
+        url=ns.url,
+        archive=ns.archive,
+        sha256=ns.sha256,
+        destination=ns.destination,
+    )
 
 
 if __name__ == "__main__":

@@ -11,6 +11,23 @@ from .backends import frontier, mle, research
 
 ROOT = Path(__file__).resolve().parents[1]
 
+RESEARCH_DATASETS = [
+    "BrowseComp",
+    "HLE",
+    "GAIA-2023-validation-text-103",
+    "DeepSearch-QA",
+    "xBench-DeepSearch-2510",
+    "HLE-NoTool",
+    "WideSearch-en",
+    "WideSearch-zh-en-prompt",
+    "WideSearch-en-sft-eval",
+    "WideSearch-zh-sft-eval",
+    "DeepWideSearch",
+    "MoNaCo",
+    "DeepResearch-Bench",
+    "BrowseComp-Zh-official-en-prompt",
+]
+
 
 def _run(args: list[str], env: dict[str, str], dry_run: bool) -> int:
     print("$", " ".join(_quote(x) for x in args))
@@ -42,8 +59,8 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="check the assembled repository")
     sub.add_parser("list", help="list available backends")
-    p = sub.add_parser("research", help="BrowseComp/HLE/GAIA/DeepSearchQA runner")
-    p.add_argument("dataset", choices=["BrowseComp", "HLE", "GAIA-2023-validation-text-103", "DeepSearch-QA"])
+    p = sub.add_parser("research", help="run one or more research datasets")
+    p.add_argument("dataset", nargs="+", choices=RESEARCH_DATASETS, metavar="DATASET")
     p.add_argument("--mode", default="direct", choices=["direct", "refine_summary", "return"])
     p.add_argument("--model", "--model-name", dest="model", default="")
     p.add_argument(
@@ -58,6 +75,15 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument("--data-path", default="")
     p.add_argument("--save-path", default="")
+    p.add_argument(
+        "--n",
+        "--num-tasks",
+        dest="num_tasks",
+        type=int,
+        default=None,
+        help="evaluate the first N rows (or N rows after --start-index)",
+    )
+    p.add_argument("--start-index", type=int, default=0, help="zero-based first row to evaluate")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--extra", action="append", default=[], help="pass an extra evaluator flag (repeatable)")
     p = sub.add_parser("algorithmic", help="Frontier-CS C++ solution evaluation")
@@ -79,7 +105,7 @@ def main(argv: list[str] | None = None) -> None:
     if ns.command == "doctor":
         raise SystemExit(doctor(ns))
     if ns.command == "list":
-        print("research: BrowseComp, HLE, GAIA-2023-validation-text-103, DeepSearch-QA")
+        print("research: " + ", ".join(RESEARCH_DATASETS))
         print("algorithmic: Frontier-CS algorithmic problems (C++17)")
         print("mle: MLE-bench Lite competitions through vendor/mle_lite")
         return
@@ -93,6 +119,8 @@ def main(argv: list[str] | None = None) -> None:
             base_url=ns.base_url,
             data_path=ns.data_path,
             save_path=ns.save_path,
+            num_tasks=ns.num_tasks,
+            start_index=ns.start_index,
             dry_run=ns.dry_run,
             extra=ns.extra,
         )

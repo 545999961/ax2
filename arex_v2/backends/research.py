@@ -7,7 +7,7 @@ from pathlib import Path
 
 def command(
     repo_root: Path,
-    dataset: str,
+    datasets: str | list[str],
     *,
     mode: str = "direct",
     model: str = "",
@@ -15,19 +15,32 @@ def command(
     base_url: str = "",
     data_path: str = "",
     save_path: str = "",
+    num_tasks: int | None = None,
+    start_index: int = 0,
     dry_run: bool = False,
     extra: list[str] | None = None,
 ) -> tuple[list[str], dict[str, str]]:
     script = repo_root / "vendor" / "research" / "eval_unified.py"
     if not script.is_file():
         raise FileNotFoundError(script)
-    args = [sys.executable, str(script), "--datasets", dataset, "--mode", mode]
+    selected = [datasets] if isinstance(datasets, str) else list(datasets)
+    if not selected or any(not item for item in selected):
+        raise ValueError("at least one research dataset is required")
+    if start_index < 0:
+        raise ValueError("start_index must be zero or greater")
+    args = [sys.executable, str(script), "--datasets", *selected, "--mode", mode]
     if model:
         args += ["--model", model]
     if data_path:
         args += ["--data_path", data_path]
     if save_path:
         args += ["--save_path", save_path]
+    if start_index:
+        args += ["--start_index", str(start_index)]
+    if num_tasks is not None:
+        if num_tasks <= 0:
+            raise ValueError("num_tasks must be greater than zero")
+        args += ["--end_index", str(start_index + num_tasks)]
     if dry_run:
         args.append("--dry-run")
     args += list(extra or [])
