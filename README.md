@@ -172,7 +172,6 @@ vendor/mle_lite/          MLE-bench Lite harness snapshot
 algorithmic/              Frontier judge; problems downloaded on demand
 scripts/                  data preparation, download, and diagnostics
 configs/                  safe configuration examples (no secrets)
-reference/                original runners kept for reproducibility
 docs/                     configuration and per-benchmark scoring guides
 assets/                   logo, icons, and benchmark result artwork
 site/                     static homepage and GitHub Pages workflow

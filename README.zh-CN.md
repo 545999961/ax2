@@ -166,7 +166,6 @@ vendor/mle_lite/          MLE-bench Lite harness 快照
 algorithmic/              Frontier 评测服务；题目按需下载
 scripts/                  数据准备、下载和诊断脚本
 configs/                  安全的配置示例（不含密钥）
-reference/                为复现保留的原始 runner
 docs/                     配置和各基准计分说明
 assets/                   logo、图标和 benchmark 效果图
 site/                     静态项目主页和 GitHub Pages 工作流
