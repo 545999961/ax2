@@ -12,7 +12,7 @@ dependencies = []
 [project.optional-dependencies]
 research = ["openai", "httpx", "requests", "pandas", "pyarrow", "pillow", "pypdf", "rich", "transformers"]
 frontier = ["pyyaml", "requests", "openai", "anthropic", "datasets", "tqdm"]
-all = ["arex-v2[research,frontier]"]
+all = ["openai", "httpx", "requests", "pandas", "pyarrow", "pillow", "pypdf", "rich", "transformers", "pyyaml", "anthropic", "datasets", "tqdm"]
 
 [project.scripts]
 arex = "arex_v2.cli:main"
