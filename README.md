@@ -21,6 +21,7 @@ normal GitHub clone small and lets a clean worker fetch the data at runtime.
 ```text
 arex_v2/                 stdlib-only CLI and subprocess adapters
 vendor/frontier_cs/      Frontier-CS Python package snapshot
+vendor/harbor_pi_supported/ Harbor runtime source snapshot
 algorithmic/              Frontier-CS judge and scripts; problems downloaded on demand
 vendor/mle_lite/         MLE-bench Lite pi harness snapshot
 vendor/research/         BrowseComp/HLE/GAIA/DeepSearchQA evaluator and configs
@@ -70,7 +71,7 @@ python3 scripts/download_algorithmic.py
 python3 -m arex_v2 algorithmic 1 solution.cpp --backend docker
 ```
 
-The Frontier and Docker/SkyPilot dependencies are optional; they are listed in
+The bundled Harbor source is available under `vendor/harbor_pi_supported/`. The Frontier and Docker/SkyPilot dependencies are optional; they are listed in
 `pyproject.toml` and are not imported by the stdlib-only CLI until this backend
 is actually run.
 
