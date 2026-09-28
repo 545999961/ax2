@@ -32,7 +32,7 @@ def main() -> None:
         print(f"downloading {url}")
         download(url, archive, ns.sha256)
     prefix = f"{ns.repo.split('/')[-1]}-{ns.ref}/algorithmic/problems/"
-    destination = ns.destination
+    destination = ns.destination / "problems"
     try:
         extract_tar(archive, destination, prefix=prefix)
     except tarfile.ReadError:
