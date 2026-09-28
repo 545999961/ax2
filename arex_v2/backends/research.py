@@ -6,12 +6,12 @@ import os
 import sys
 from pathlib import Path
 
-from ..datasets import CATALOG, data_root as resolve_data_root, dataset_paths
+from ..datasets import data_root as resolve_data_root, dataset_paths, path_is_ready, research_names
 
 
 def command(
     repo_root: Path, datasets: str | list[str], *, mode: str = "direct",
-    model: str = "", api_key_env: str = "API_KEY", base_url: str = "",
+    model: str = "", api_key_env: str = "MODEL_API_KEY", base_url: str = "",
     data_path: str = "", save_path: str = "", data_root: str = "",
     tokenizer_path: str = "", num_tasks: int | None = None, start_index: int = 0,
     concurrency: int = 4, shuffle: bool = False,
@@ -22,6 +22,13 @@ def command(
     selected = list(dict.fromkeys([datasets] if isinstance(datasets, str) else datasets))
     if not selected or start_index < 0 or (num_tasks is not None and num_tasks <= 0):
         raise ValueError("select a dataset, a nonnegative start index, and a positive task count")
+    available = set(research_names())
+    unknown = [name for name in selected if name not in available]
+    if unknown:
+        raise ValueError(
+            "Unknown research dataset(s): " + ", ".join(unknown)
+            + ". Run `python -m arex_v2 list` to see available datasets."
+        )
     if data_path and len(selected) != 1:
         raise ValueError("--data-path requires exactly one dataset; use --data-root for multiple datasets")
     env = os.environ.copy()
@@ -30,8 +37,9 @@ def command(
     if data_path:
         paths[selected[0]] = str(Path(data_path).expanduser().resolve())
     if not dry_run:
-        for name, path in paths.items():
-            if not Path(path).is_file():
+        for name in selected:
+            path = paths.get(name)
+            if not path or not path_is_ready(path):
                 raise ValueError(f"Missing data for {name}. Run: python -m arex_v2 download {name}")
         if not model:
             raise ValueError("Set AREX_MODEL_NAME or --model-name")

@@ -9,7 +9,7 @@ import sys
 from pathlib import Path
 
 from .data import download, sha256
-from .datasets import CATALOG, ROOT, data_root, dataset_paths
+from .datasets import CATALOG, ROOT, data_root, dataset_paths, path_is_ready, research_names
 
 
 def convert_rows(kind: str, rows: list[dict]) -> list[dict]:
@@ -86,11 +86,12 @@ def run(ns) -> int:
     if ns.all:
         names = [*CATALOG, "algorithmic"]
     if ns.list:
-        existing = dataset_paths(root, list(CATALOG), use_legacy=not (ns.data_root or os.environ.get("AREX_DATA_ROOT")))
-        for name, spec in CATALOG.items():
-            path = Path(existing[name])
-            ready = path.is_file() and path.stat().st_size > 0
-            print(f"{'READY' if ready else 'MISSING':7} {name:32} {path}")
+        names = research_names()
+        existing = dataset_paths(root, names, use_legacy=not (ns.data_root or os.environ.get("AREX_DATA_ROOT")))
+        for name in names:
+            path = Path(existing.get(name, "")) if existing.get(name) else None
+            ready = path is not None and path_is_ready(path)
+            print(f"{'READY' if ready else 'MISSING':7} {name:32} {path or '(no path in config)'}")
         print(f"Frontier-CS: {ROOT / 'algorithmic/problems'} (download algorithmic)")
         return 0
     failed = []

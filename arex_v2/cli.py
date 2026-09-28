@@ -4,7 +4,6 @@ import argparse
 import os
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 
 from .backends import frontier, mle, research
@@ -75,13 +74,17 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--force", action="store_true", help="refresh existing prepared research data")
     p.add_argument("--list", action="store_true")
     p.add_argument("--dry-run", action="store_true")
-    p = sub.add_parser("research", aliases=["eval"], help="run one or more research datasets")
+    p = sub.add_parser(
+        "research",
+        aliases=["eval", "evaluate"],
+        help="evaluate one or more research datasets (dataset selection is the only positional input)",
+    )
     p.add_argument("dataset", nargs="+", type=dataset_name, metavar="DATASET")
     p.add_argument("--mode", default="direct", choices=["direct", "refine_summary", "return"])
     p.add_argument("--model", "--model-name", dest="model", default=os.environ.get("AREX_MODEL_NAME", ""))
     p.add_argument(
         "--api-key-env",
-        default=os.environ.get("AREX_API_KEY_ENV", "API_KEY"),
+        default=os.environ.get("AREX_API_KEY_ENV", "MODEL_API_KEY"),
         help="environment variable containing the model API key (never printed or passed as a CLI value)",
     )
     p.add_argument(
@@ -146,7 +149,7 @@ def main(argv: list[str] | None = None) -> None:
         print("algorithmic: Frontier-CS algorithmic problems (C++17)")
         print("mle: MLE-bench Lite competitions through vendor/mle_lite")
         return
-    if ns.command in ("research", "eval"):
+    if ns.command in ("research", "eval", "evaluate"):
         try:
             args, env = research.command(
                 ROOT, ns.dataset, mode=ns.mode, model=ns.model,

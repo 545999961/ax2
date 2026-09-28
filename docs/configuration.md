@@ -1,98 +1,88 @@
 # Configuration
 
-The top-level CLI keeps the common options small. Dataset-specific options stay
-in `vendor/research/eval_unified.py` and can be passed with repeatable
+The repository wrapper keeps the common options small. Dataset-specific options
+remain in `vendor/research/eval_unified.py` and can be passed with repeated
 `--extra` arguments.
 
-## Common research options
+## Common options
 
 ```text
-research DATASET [DATASET ...]
-  --n / --num-tasks N       select N rows
+evaluate DATASET [DATASET ...]
+  --n / --num-tasks N       number of rows
   --start-index I           zero-based first row (default 0)
   --mode direct|refine_summary|return
-  --model-name NAME         provider model identifier
-  --api-key-env ENV_NAME    name of the environment variable holding the key
+  --model NAME              provider model identifier
+  --api-key-env ENV_NAME    environment variable containing the key
   --base-url URL             OpenAI-compatible model endpoint
-  --data-path PATH          override the data file (one dataset only)
-  --data-root PATH          prepared data root (default: ./data)
-  --save-path PATH          result root
-  --extra FLAG              pass one evaluator-specific flag; repeat it
+  --data-path PATH           override one selected dataset's input
+  --data-root PATH           prepared data root (default: ./data)
+  --save-path PATH           result root (default: runs/<timestamp>)
+  --concurrency N            maximum concurrent cases (default: 4)
+  --extra FLAG               evaluator-specific flag; repeat it
 ```
 
-For example, these options select rows 100 through 119 and limit concurrent
-cases to four:
+For example:
 
 ```bash
-python3 -m arex_v2 research BrowseComp \
-  --start-index 100 --n 20 \
+python3 evaluate.py BrowseComp --start-index 100 --n 20 \
   --extra=--concurrency_limit=4
 ```
 
-The value of `--api-key-env` is a variable name, not the secret itself. The
-adapter copies that variable into an internal process environment variable;
-the secret is never appended to the command preview. `--model-name` and
-`--base-url` are safe to show in logs because they are not credentials.
+`--api-key-env` is a variable name, not the secret. The adapter copies that
+variable to the evaluator's private environment and never puts its value in the
+command preview. `--model` and `--base-url` are safe to show.
+
+Use `--dry-run` to inspect the exact subprocess command. It does not call a
+model, search service, page reader, judge, or Docker. A real invocation checks
+that the selected data exists before launching the evaluator.
 
 ## Environment variables
 
-| Variable | Used by | Required when |
+| Variable | Used by | Required |
 | --- | --- | --- |
-| `MODEL_API_KEY` (or another name selected by `--api-key-env`) | model SDK | any real model call |
-| `SERPER_API_KEY` | `search`, `google_scholar` | research tools use Serper |
-| `JINA_API_KEY` | `visit` | private/rate-limited Jina endpoint |
-| `SERPER_API_URL` | Serper adapter | custom search endpoint |
-| `SERPER_SCHOLAR_API_URL` | Serper Scholar adapter | custom Scholar endpoint |
-| `JINA_API_URL` | Jina adapter | custom Reader endpoint |
+| `MODEL_API_KEY` (or the variable named by `--api-key-env`) | model SDK | every real research run |
+| `AREX_MODEL_NAME` | default model | every real research run |
+| `AREX_BASE_URL` | default model endpoint | when using a custom endpoint |
+| `AREX_TOKENIZER_PATH` | local token counting | unified research datasets |
+| `SERPER_API_KEY` | `search`, `google_scholar` | research tools |
+| `JINA_API_KEY` | `visit` | private or rate-limited Jina |
+| `HF_TOKEN` | Hugging Face downloader | HLE and GAIA preparation |
 | `MLE_BENCH` | MLE-bench Lite | MLE prepare/run |
-| `HF_TOKEN` | Hugging Face gated downloader | HLE/GAIA preparation after access approval |
-| `AREX_TOKENIZER_PATH` | local tokenizer | research token counting |
-| provider-specific keys | Frontier/MLE adapters | according to the selected backend |
 
-`configs/model.env.example` contains names and placeholders only. Keep real
-values in a local ignored file or a secret manager.
+Optional endpoint variables are `SERPER_API_URL`,
+`SERPER_SCHOLAR_API_URL`, and `JINA_API_URL`. Keep real values in the local
+ignored `.env` or a secret manager.
 
-## Dataset paths
+## Data paths
 
-The canonical prepared paths are under `data/`; legacy paths in
-`vendor/research/datasets/` remain accepted when `--data-root` is omitted. The
-dataset defaults are defined in
-`vendor/research/dataset_configs/*/config.json`:
+Downloadable datasets use `data/<dataset>/...`:
 
 | Dataset | Default input |
 | --- | --- |
 | BrowseComp | `data/BrowseComp/browse_comp_test_set.csv` |
+| DeepSearch-QA | `data/DeepSearch-QA/DSQA-full.csv` |
 | HLE | `data/HLE/text_items.jsonl` |
 | GAIA-2023-validation-text-103 | `data/GAIA-2023-validation-text-103/standardized_data.jsonl` |
-| DeepSearch-QA | `data/DeepSearch-QA/DSQA-full.csv` |
 
-Use `--data-path` for one selected dataset. The evaluator rejects a single path
-override for a multi-dataset run rather than applying the wrong file to every
-dataset.
+When no `--data-root` is supplied, a matching legacy file under
+`vendor/research/` is still accepted. Other evaluator datasets use the path
+in `vendor/research/dataset_configs/*/config.json`; inspect them with
+`python3 -m arex_v2 download --list`.
 
-## Advanced evaluator options
+`--data-path` is rejected for a multi-dataset command rather than applying one
+file to every dataset.
 
-The underlying evaluator accepts flags such as:
+## Advanced options and reruns
+
+The underlying evaluator accepts options such as:
 
 ```bash
-python3 -m arex_v2 research HLE --n 20 \
-  --extra=--concurrency_limit=8 \
+python3 evaluate.py HLE --n 20 \
   --extra=--hle-max-completion-tokens=32768 \
   --extra=--disable-visit-fallback
 ```
 
-For a full list, run:
-
-```bash
-python3 vendor/research/eval_unified.py --help
-```
-
-Use `--dry-run` first. A dry run prints the constructed subprocess command and
-does not call a model, Serper, Jina, judge, or Docker.
-
-## Results and reruns
-
-Set a unique `--save-path` for each model, mode, and task range. A research run
-creates `<save-path>/<dataset>/.../result.json`. The default evaluator skip mode
-is `correct`; use `--extra=--skip-existing-mode=none` when intentionally rerunning
-all selected cases. Do not mix different model endpoints in one result root.
+Use `python3 vendor/research/eval_unified.py --help` for the full list. Set a
+unique `--save-path` for each model, mode, and task range. Existing correct
+cases are skipped by default; pass
+`--extra=--skip-existing-mode=none` to rerun them deliberately.

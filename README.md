@@ -1,202 +1,118 @@
-<div align="center">
+# AREX Evaluation Suite
 
-<img src="assets/arex-official.png" alt="AREX" width="420" />
+AREX is the evaluation checkout used by `self_evolving_v15`. It puts the
+research benchmarks, their scorers, the Frontier-CS judge, and the MLE-bench
+Lite runner behind one small command line interface. Benchmark data and model
+outputs stay outside Git.
 
-<p><strong>Unified agent research, search, reasoning, and benchmark evaluation</strong></p>
-
-<a href="README.zh-CN.md">中文文档</a> · <a href="docs/evaluation.md">Evaluation</a> · <a href="docs/configuration.md">Configuration</a>
-
-<br />
-
-<img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+" />
-<img src="https://img.shields.io/badge/Search-Serper-1D9BF0" alt="Serper search" />
-<img src="https://img.shields.io/badge/Visit-Jina%20Reader-16A085" alt="Jina Reader visit" />
-<img src="https://img.shields.io/badge/Data-on%20demand-F59E0B" alt="Data on demand" />
-
-</div>
-
-> **AREX Evaluation Suite** packages the research evaluators, data preparation,
-> and benchmark runners in one reproducible entry point. The Python module
-> remains `arex_v2`, so existing commands continue to work.
-
-AREX Evaluation Suite is the single entry point for the evaluation code used by
-`self_evolving_v15`. It combines the research benchmarks, Frontier-CS
-algorithmic judge, and MLE-bench Lite runner without copying their large or
-licensed datasets into Git.
-
-The logo follows the official [AREX research site](https://arex-research.com/).
-
-- Chinese README: [README.zh-CN.md](README.zh-CN.md)
-- Homepage: [AREX Evaluation Suite](https://545999961.github.io/AREX-v2/)
-- Detailed configuration: [docs/configuration.md](docs/configuration.md)
-- Evaluation and scoring: [docs/evaluation.md](docs/evaluation.md)
-- Original upstream snapshots and licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
-
-## 📈 Performance snapshot
-
-The checked-in chart is the current project comparison snapshot. It is kept as
-an SVG so it stays sharp in the GitHub README and can be downloaded for reports.
-
-![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
-
-Scores are only comparable when the model endpoint, task range, tools, and
-judge configuration are recorded with the run. See [Evaluation and scoring](docs/evaluation.md).
-
-The command flow follows the same shape as the MiroThinker project: install,
-prepare data, choose a benchmark, run a small smoke test, then inspect the
-official score artifacts. See the upstream organization for reference:
-[MiroThinker](https://github.com/MiroMindAI/MiroThinker).
-
-<details>
-<summary>Contents</summary>
-
-- [Performance snapshot](#-performance-snapshot)
-- [Quick start](#-quick-start)
-- [Configuration](#-model-search-and-visit-configuration)
-- [Repository map](#-repository-map)
-- [Evaluation artifacts](#-what-to-inspect-after-a-run)
-
-</details>
-
-## 🚀 Quick start
-
-### 1. Install
-
-Python 3.10+ is required. Install only the extra needed by the evaluator:
+The usual path is deliberately short:
 
 ```bash
 python3 -m venv .venv
 source .venv/bin/activate
-pip install -e '.[research]'       # BrowseComp/HLE/GAIA/DeepSearch-QA
-# pip install -e '.[frontier]'     # Frontier-CS
-# pip install -e '.[all]'          # all Python dependencies
-python3 -m arex_v2 doctor
-```
-
-### 2. Prepare data with one command
-
-```bash
-python3 scripts/download_data.py --all
-python3 scripts/download_data.py --list
-# equivalent module form:
-python3 -m arex_v2 download --all
-```
-
-The command downloads the public Frontier-CS problem archive into
-`algorithmic/problems/` and prepares the core research datasets under `data/`.
-BrowseComp and DeepSearch-QA have public publisher files; HLE and GAIA require
-accepting their gated Hugging Face terms and setting `HF_TOKEN`. If a gated
-download is unavailable, the command reports the missing dataset and leaves
-all already completed downloads intact. Use `--list` to see the current state.
-
-To pin a Frontier mirror and verify its archive:
-
-```bash
-python3 scripts/download_algorithmic.py \
-  --url https://mirror.example/frontier-cs.tar.gz \
-  --sha256 SHA256_HEX
-```
-
-### 3. Run an evaluation
-
-The normal research command only needs a dataset name and a task count:
-
-```bash
-cp configs/model.env.example .env  # edit model/key/tokenizer values first
+pip install -e '.[research]'
+cp configs/model.env.example .env
+# edit .env, then load it into the shell
 set -a; source .env; set +a
-python3 -m arex_v2 research BrowseComp --n 10 --dry-run
-python3 -m arex_v2 research BrowseComp --n 10 \
-  --model provider/model-name \
-  --api-key-env MODEL_API_KEY \
-  --base-url https://api.example.com/v1 \
-  --save-path runs/browsecomp-10
-```
 
-`--n 10` evaluates rows `[0, 10)`. Use `--start-index 100 --n 20` for rows
-`[100, 120)`. Several datasets can share one run and the same range:
-
-```bash
-python3 -m arex_v2 research BrowseComp HLE --n 5 --save-path runs/smoke
-```
-
-`--data-path` is intentionally limited to one selected dataset because each
-benchmark has a different file format. For multiple datasets, keep their
-files at the default paths listed in the dataset configs, or pass per-dataset
-options through `--extra`; see [docs/configuration.md](docs/configuration.md).
-
-Other backends use the same top-level CLI:
-
-```bash
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
-```
-
-## ⚙️ Model, search, and visit configuration
-
-Every model-backed run has three independent endpoint settings:
-
-| Setting | Example | Meaning |
-| --- | --- | --- |
-| model name | `provider/model-name` | model identifier sent to the provider |
-| API key | `MODEL_API_KEY` | **environment variable name** containing the secret |
-| base URL | `https://api.example.com/v1` | optional OpenAI-compatible endpoint |
-
-The API key value is read from the environment and never put in argv, logs, or
-the repository. Copy `configs/model.env.example` to a local ignored file if it
-helps organize the variables. The evaluator uses `AREX_SDK_API_KEY`,
-`AREX_SDK_BASE_URL`, and `AREX_MODEL_NAME` internally.
-
-The agent also needs a local tokenizer for token counting. Set
-`AREX_TOKENIZER_PATH` in the example file or add `--tokenizer-path PATH`; this
-is independent of the served model endpoint.
-
-Research tools have a separate fixed contract:
-
-```bash
-export SERPER_API_KEY='...'   # search and Google Scholar
-export JINA_API_KEY='...'     # visit; optional for public r.jina.ai
-```
-
-`search` uses Serper and `visit` uses Jina Reader. Optional endpoint overrides
-are `SERPER_API_URL`, `SERPER_SCHOLAR_API_URL`, and `JINA_API_URL`. No key is
-stored in this repository. A dry run checks command construction without
-calling either service.
-
-## 🗂️ Repository map
-
-```text
-arex_v2/                  small stdlib-only CLI and backend adapters
-vendor/research/          unified research evaluator and dataset configs
-vendor/frontier_cs/       Frontier-CS Python source snapshot
-vendor/mle_lite/          MLE-bench Lite harness snapshot
-algorithmic/              Frontier judge; problems downloaded on demand
-scripts/                  data preparation, download, and diagnostics
-configs/                  safe configuration examples (no secrets)
-docs/                     configuration and per-benchmark scoring guides
-assets/                   logo, icons, and benchmark result artwork
-site/                     static homepage and GitHub Pages workflow
-```
-
-Runtime data, result directories, credentials, and downloaded problem archives
-are ignored by Git. Upstream notices and source versions are recorded in
-`THIRD_PARTY_NOTICES.md` and `SNAPSHOT.txt`.
-
-## ✅ What to inspect after a run
-
-Research runs write one directory per dataset under `--save-path`. Inspect each
-case's `result.json` and aggregate the `score_result.score` values. Keep the
-judge status, `official_scorer`, `judge_raw`, and error fields alongside the
-numeric score. Frontier uses checker case scores; MLE-bench uses the host
-grader. The complete per-task rules are in [docs/evaluation.md](docs/evaluation.md).
-
-## 🔧 Useful commands
-
-```bash
 python3 -m arex_v2 list
-python3 -m arex_v2 doctor
-python3 scripts/download_data.py --list
-python3 -m arex_v2 research BrowseComp --n 1 --dry-run
-python3 -m arex_v2 download DeepSearch-QA --dry-run
+python3 -m arex_v2 download BrowseComp
+python3 evaluate.py BrowseComp --n 1 --dry-run
+python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 ```
 
-Do not commit benchmark files, API keys, model outputs, or local `.env` files.
+`evaluate.py DATASET` and `python3 -m arex_v2 evaluate DATASET` are equivalent.
+The dataset is the only positional choice. Add another dataset name to run
+several datasets with the same model and task range:
+
+```bash
+python3 evaluate.py BrowseComp HLE --n 5 --save-path runs/smoke
+```
+
+## Before the first run
+
+The model endpoint needs three settings:
+
+| Setting | Example | Where it is read |
+| --- | --- | --- |
+| model | `provider/model-name` | `AREX_MODEL_NAME` |
+| API key | `secret-value` | value of `MODEL_API_KEY` |
+| base URL | `https://api.example.com/v1` | `AREX_BASE_URL` |
+
+The command receives the **name** of the key variable (`MODEL_API_KEY` by
+default), never the secret itself. Research runs also count tokens locally, so
+set `AREX_TOKENIZER_PATH` to a tokenizer available to Transformers. Search and
+page visits use `SERPER_API_KEY` and `JINA_API_KEY`; a dry run does not call
+either service.
+
+`configs/model.env.example` contains variable names only. Keep the edited
+`.env` local; it is ignored by Git.
+
+## Datasets
+
+Run `python3 -m arex_v2 list` for the names accepted by the evaluator. The
+download command prepares the four datasets with a public or Hugging Face
+source:
+
+| Dataset | Preparation | Per-case score |
+| --- | --- | --- |
+| BrowseComp | `python3 -m arex_v2 download BrowseComp` | BrowseComp official judge |
+| DeepSearch-QA | `python3 -m arex_v2 download DeepSearch-QA` | DeepSearch-QA autorater |
+| HLE | `python3 -m arex_v2 download HLE` after accepting HF terms and setting `HF_TOKEN` | HLE judge; `metrics.full_credit` |
+| GAIA-2023-validation-text-103 | `python3 -m arex_v2 download GAIA-2023-validation-text-103` after setting `HF_TOKEN` | GAIA text judge |
+
+The evaluator also contains configurations for `HLE-NoTool`,
+`xBench-DeepSearch-2510`, the WideSearch variants, `DeepWideSearch`,
+`MoNaCo`, `DeepResearch-Bench`, and `BrowseComp-Zh-official-en-prompt`.
+Those datasets have their own licenses or source layouts; place the prepared
+files at the path shown by `python3 -m arex_v2 download --list`, or pass
+`--data-path` for one selected dataset. A missing path is reported before the
+evaluator starts.
+
+Use `--data-root PATH` to keep prepared data somewhere else. `--data-path PATH`
+is intentionally limited to a single dataset so one file cannot accidentally
+be used for several benchmarks.
+
+## Selecting tasks and reading results
+
+```bash
+# rows [0, 20)
+python3 evaluate.py BrowseComp --n 20
+
+# rows [100, 120)
+python3 evaluate.py BrowseComp --start-index 100 --n 20
+
+# show the exact subprocess command without model, search, judge, or Docker calls
+python3 evaluate.py BrowseComp --n 1 --dry-run
+```
+
+Each run creates one directory per dataset under `--save-path`. For research
+benchmarks, inspect each case's `result.json`. Aggregate `score_result.score`
+only after checking `status`, `official_scorer`, `judge_raw`, and any error
+fields. Keep the model, endpoint, mode, task range, and Git commit with the
+aggregate; scores from different settings are not directly comparable.
+
+The detailed scoring rules and result examples are in
+[docs/evaluation.md](docs/evaluation.md). Configuration details, including
+advanced evaluator flags passed with repeated `--extra`, are in
+[docs/configuration.md](docs/configuration.md). Chinese documentation is
+available in [README.zh-CN.md](README.zh-CN.md).
+
+## Other backends
+
+The same CLI also exposes the two bundled non-research runners:
+
+```bash
+python3 scripts/download_data.py --dataset algorithmic
+python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+
+MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
+MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification
+```
+
+Use `python3 -m arex_v2 doctor` when checking a fresh checkout. The repository
+map is kept small on purpose: `arex_v2/` contains the CLI and adapters,
+`vendor/` contains upstream evaluator snapshots, `configs/` contains safe
+examples, and `docs/` explains preparation and scoring. See
+[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [SNAPSHOT.txt](SNAPSHOT.txt)
+for upstream versions and licenses.

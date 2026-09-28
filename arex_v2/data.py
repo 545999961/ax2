@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import hashlib
-import io
 import shutil
 import tarfile
 import urllib.request
