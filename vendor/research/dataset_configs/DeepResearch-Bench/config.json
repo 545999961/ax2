@@ -1,0 +1,16 @@
+{
+  "name": "DeepResearch-Bench",
+  "data_path": "${UNIFY_EVAL_ROOT}/datasets/DeepResearch Bench/prompt_data/query.jsonl",
+  "data_format": "jsonl",
+  "task_type": "long_report",
+  "question_field": "prompt",
+  "answer_field": "prompt",
+  "id_field": "id",
+  "metadata_fields": ["topic", "language"],
+  "criteria_path": "${UNIFY_EVAL_ROOT}/datasets/DeepResearch Bench/criteria_data/criteria.jsonl",
+  "reference_path": "${UNIFY_EVAL_ROOT}/datasets/DeepResearch Bench/test_data/cleaned_data/reference.jsonl",
+  "scorer": {
+    "type": "deepresearch_race_official",
+    "source": "deep_research_bench/deepresearch_bench_race.py RACE"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "name": "HLE",
+  "data_path": "${UNIFY_EVAL_ROOT}/hle_0724_vendor/data_json/text_items.jsonl",
+  "data_format": "jsonl",
+  "evaluation_backend": "hle_0724",
+  "tools": ["search", "google_scholar", "visit", "update_context", "code_interpreter", "finish"],
+  "task_type": "qa_multimodal",
+  "question_field": "question",
+  "answer_field": "answer",
+  "id_field": "id",
+  "exclude_image_rows": true,
+  "metadata_fields": ["answer_type", "author_name", "rationale", "raw_subject", "category", "canary", "image"],
+  "attachments_root": "${UNIFY_EVAL_ROOT}/datasets/HLE",
+  "scorer": {
+    "type": "hle_official",
+    "source": "${UNIFY_EVAL_ROOT}/hle_0724_vendor/HLE_judge.py (0724 HLE judge)"
+  }
+}

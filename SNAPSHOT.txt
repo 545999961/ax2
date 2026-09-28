@@ -1,0 +1,9 @@
+Source snapshots assembled 2026-09-28 from the two archives supplied in
+`inference/code/`:
+
+- Frontier-CS-Algo-release.zip -> `vendor/frontier_cs/`, `algorithmic/`, and `vendor/frontier_run/`.
+- mle-lite-pi-harness-main.zip -> `vendor/mle_lite/`.
+- Existing research evaluator -> `vendor/research/` (datasets and generated results excluded).
+
+`algorithmic/problems/`, research datasets, model outputs, and credentials are
+runtime inputs and are intentionally not part of this Git tree.

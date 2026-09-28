@@ -1,0 +1,14 @@
+{
+  "name": "MoNaCo",
+  "data_path": "${UNIFY_EVAL_ROOT}/datasets/MoNaCo/execution_traces",
+  "data_format": "monaco_traces",
+  "task_type": "qa",
+  "question_field": "question",
+  "answer_field": "answer",
+  "id_field": "trace_path",
+  "metadata_fields": ["trace_path", "canary"],
+  "scorer": {
+    "type": "monaco_official",
+    "source": "monaco/prompts/evaluate_final_answers.py + answer_judgement_prompt_V2.py"
+  }
+}

@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+runs/
+results/
+logs/
+.cache/
+data/
+algorithmic/problems/
+algorithmic/solutions/
+algorithmic/submissions/
+vendor/research/datasets/
+vendor/research/hle_0724_vendor/data_json/*.jsonl
