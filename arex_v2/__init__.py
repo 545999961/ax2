@@ -1,3 +1,3 @@
-"""Single entrypoint for the AREX v2 evaluation collection."""
+"""Single entrypoint for the AREX Benchmark evaluation collection."""
 
 __version__ = "0.1.0"

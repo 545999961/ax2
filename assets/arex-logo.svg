@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 320" role="img" aria-labelledby="title desc">
+  <title id="title">AREX Benchmark</title>
+  <desc id="desc">Unified agent research and evaluation exchange.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="320" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D1835"/>
+      <stop offset="1" stop-color="#101D45"/>
+    </linearGradient>
+    <linearGradient id="path" x1="58" y1="260" x2="280" y2="60" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#66E3C4"/>
+      <stop offset=".52" stop-color="#70A5FF"/>
+      <stop offset="1" stop-color="#FFB86C"/>
+    </linearGradient>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="14" stdDeviation="12" flood-color="#000" flood-opacity=".25"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="320" rx="42" fill="url(#bg)"/>
+  <rect x="34" y="34" width="252" height="252" rx="58" fill="#081225" filter="url(#shadow)"/>
+  <path d="M82 253 145 67c5-14 25-14 30 0l63 186" fill="none" stroke="url(#path)" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M110 184h100" fill="none" stroke="#F5F8FF" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="82" cy="253" r="11" fill="#66E3C4"/>
+  <circle cx="154" cy="55" r="11" fill="#FFB86C"/>
+  <circle cx="226" cy="253" r="11" fill="#70A5FF"/>
+  <circle cx="110" cy="184" r="8" fill="#F5F8FF"/>
+  <circle cx="210" cy="184" r="8" fill="#F5F8FF"/>
+  <text x="350" y="148" fill="#F5F8FF" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="86" font-weight="800" letter-spacing="8">AREX</text>
+  <text x="358" y="211" fill="#9FB2D9" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="30" font-weight="600" letter-spacing="5">BENCHMARK</text>
+  <text x="358" y="258" fill="#66E3C4" font-family="Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, sans-serif" font-size="18" font-weight="500" letter-spacing="2">UNIFIED AGENT RESEARCH &amp; EVALUATION</text>
+</svg>

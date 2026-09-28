@@ -1,6 +1,23 @@
-# AREX v2
+<div align="center">
 
-AREX v2 是 `self_evolving_v15` 的统一评测入口，把 research 基准、
+<img src="assets/arex-logo.svg" alt="AREX Benchmark" width="760" />
+
+<p><strong>统一的 agent research、搜索、推理与基准评测平台</strong></p>
+
+<a href="README.md">English</a> · <a href="docs/evaluation.zh-CN.md">评测说明</a> · <a href="docs/configuration.zh-CN.md">配置说明</a>
+
+<br />
+
+<img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+" />
+<img src="https://img.shields.io/badge/Search-Serper-1D9BF0" alt="Serper search" />
+<img src="https://img.shields.io/badge/Visit-Jina%20Reader-16A085" alt="Jina Reader visit" />
+<img src="https://img.shields.io/badge/Data-on%20demand-F59E0B" alt="Data on demand" />
+
+</div>
+
+> **AREX Benchmark**（原 AREX v2）代表 **Agent Research & Evaluation eXchange**。Python 兼容模块仍然叫 `arex_v2`，已有命令继续有效。
+
+AREX Benchmark 是 `self_evolving_v15` 的统一评测入口，把 research 基准、
 Frontier-CS 算法题评测器和 MLE-bench Lite 放在同一个仓库中。大体积、加密
 或受许可限制的数据不会提交到 Git。
 
@@ -9,10 +26,33 @@ Frontier-CS 算法题评测器和 MLE-bench Lite 放在同一个仓库中。大�
 - 评测与计分：[docs/evaluation.zh-CN.md](docs/evaluation.zh-CN.md)
 - 上游版本和许可证：[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
+## 📈 效果图
+
+仓库内置当前项目的 benchmark 对比图，并以 SVG 保存，GitHub 页面上可以
+保持清晰，也方便下载到报告中使用。
+
+![AREX Benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+
+只有在 model endpoint、任务范围、工具和 judge 配置一致时，分数才具有可比性。
+详见[评测和计分](docs/evaluation.zh-CN.md)。
+
 目录组织参考了 MiroThinker 的使用顺序：安装、准备数据、选择基准、先做少量
 smoke test，再查看官方评分产物。参考项目：[MiroThinker](https://github.com/MiroMindAI/MiroThinker)。
 
-## 1. 安装
+<details>
+<summary>目录</summary>
+
+- [效果图](#-效果图)
+- [快速开始](#-快速开始)
+- [配置](#-模型搜索和网页访问配置)
+- [目录结构](#-目录结构)
+- [运行后看什么](#-运行后看什么)
+
+</details>
+
+## 🚀 快速开始
+
+### 1. 安装
 
 需要 Python 3.10 或更高版本。按评测器安装依赖：
 
@@ -25,7 +65,7 @@ pip install -e '.[research]'       # BrowseComp/HLE/GAIA/DeepSearch-QA
 python3 -m arex_v2 doctor
 ```
 
-## 2. 一键准备数据
+### 2. 一键准备数据
 
 ```bash
 python3 scripts/download_data.py --all
@@ -48,7 +88,7 @@ python3 scripts/download_algorithmic.py \
   --sha256 SHA256_HEX
 ```
 
-## 3. 运行评测
+### 3. 运行评测
 
 research 的常用命令只需要数据集名称和任务数：
 
@@ -83,7 +123,7 @@ python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
 MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
 ```
 
-## 4. 模型、搜索和网页访问配置
+## ⚙️ 模型、搜索和网页访问配置
 
 每个模型评测需要三个彼此独立的端点参数：
 
@@ -112,7 +152,7 @@ export JINA_API_KEY='...'     # visit；公开 r.jina.ai 可不填
 `SERPER_API_URL`、`SERPER_SCHOLAR_API_URL` 和 `JINA_API_URL`。仓库不保存任何
 key；dry run 只检查命令，不访问服务。
 
-## 5. 目录结构
+## 🗂️ 目录结构
 
 ```text
 arex_v2/                  轻量 CLI 和后端适配器
@@ -124,12 +164,13 @@ scripts/                  数据准备、下载和诊断脚本
 configs/                  安全的配置示例（不含密钥）
 reference/                为复现保留的原始 runner
 docs/                     配置和各基准计分说明
+assets/                   logo、图标和 benchmark 效果图
 ```
 
 运行数据、结果目录、凭据和下载的题目都会被 Git 忽略。上游许可和版本记录在
 `THIRD_PARTY_NOTICES.md`、`SNAPSHOT.txt`。
 
-## 6. 运行后看什么
+## ✅ 运行后看什么
 
 research 会在 `--save-path` 下按数据集生成目录。逐题查看 `result.json`，
 汇总 `score_result.score`，并同时保留 `status`、`official_scorer`、
@@ -137,7 +178,7 @@ research 会在 `--save-path` 下按数据集生成目录。逐题查看 `result
 host grader。每个任务的详细评测规则见
 [docs/evaluation.zh-CN.md](docs/evaluation.zh-CN.md)。
 
-## 7. 常用命令
+## 🔧 常用命令
 
 ```bash
 python3 -m arex_v2 list

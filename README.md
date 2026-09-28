@@ -1,6 +1,23 @@
-# AREX v2
+<div align="center">
 
-AREX v2 is the single entry point for the evaluation code used by
+<img src="assets/arex-logo.svg" alt="AREX Benchmark" width="760" />
+
+<p><strong>Unified agent research, search, reasoning, and benchmark evaluation</strong></p>
+
+<a href="README.zh-CN.md">中文文档</a> · <a href="docs/evaluation.md">Evaluation</a> · <a href="docs/configuration.md">Configuration</a>
+
+<br />
+
+<img src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white" alt="Python 3.10+" />
+<img src="https://img.shields.io/badge/Search-Serper-1D9BF0" alt="Serper search" />
+<img src="https://img.shields.io/badge/Visit-Jina%20Reader-16A085" alt="Jina Reader visit" />
+<img src="https://img.shields.io/badge/Data-on%20demand-F59E0B" alt="Data on demand" />
+
+</div>
+
+> **AREX Benchmark** (formerly AREX v2) means **Agent Research & Evaluation eXchange**. The Python compatibility module remains `arex_v2`, so existing commands continue to work.
+
+AREX Benchmark is the single entry point for the evaluation code used by
 `self_evolving_v15`. It combines the research benchmarks, Frontier-CS
 algorithmic judge, and MLE-bench Lite runner without copying their large or
 licensed datasets into Git.
@@ -10,12 +27,35 @@ licensed datasets into Git.
 - Evaluation and scoring: [docs/evaluation.md](docs/evaluation.md)
 - Original upstream snapshots and licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 
+## 📈 Performance snapshot
+
+The checked-in chart is the current project comparison snapshot. It is kept as
+an SVG so it stays sharp in the GitHub README and can be downloaded for reports.
+
+![AREX Benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+
+Scores are only comparable when the model endpoint, task range, tools, and
+judge configuration are recorded with the run. See [Evaluation and scoring](docs/evaluation.md).
+
 The command flow follows the same shape as the MiroThinker project: install,
 prepare data, choose a benchmark, run a small smoke test, then inspect the
 official score artifacts. See the upstream organization for reference:
 [MiroThinker](https://github.com/MiroMindAI/MiroThinker).
 
-## 1. Install
+<details>
+<summary>Contents</summary>
+
+- [Performance snapshot](#-performance-snapshot)
+- [Quick start](#-quick-start)
+- [Configuration](#-model-search-and-visit-configuration)
+- [Repository map](#-repository-map)
+- [Evaluation artifacts](#-what-to-inspect-after-a-run)
+
+</details>
+
+## 🚀 Quick start
+
+### 1. Install
 
 Python 3.10+ is required. Install only the extra needed by the evaluator:
 
@@ -28,7 +68,7 @@ pip install -e '.[research]'       # BrowseComp/HLE/GAIA/DeepSearch-QA
 python3 -m arex_v2 doctor
 ```
 
-## 2. Prepare data with one command
+### 2. Prepare data with one command
 
 ```bash
 python3 scripts/download_data.py --all
@@ -52,7 +92,7 @@ python3 scripts/download_algorithmic.py \
   --sha256 SHA256_HEX
 ```
 
-## 3. Run an evaluation
+### 3. Run an evaluation
 
 The normal research command only needs a dataset name and a task count:
 
@@ -86,7 +126,7 @@ python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
 MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
 ```
 
-## 4. Model, search, and visit configuration
+## ⚙️ Model, search, and visit configuration
 
 Every model-backed run has three independent endpoint settings:
 
@@ -117,7 +157,7 @@ are `SERPER_API_URL`, `SERPER_SCHOLAR_API_URL`, and `JINA_API_URL`. No key is
 stored in this repository. A dry run checks command construction without
 calling either service.
 
-## 5. Repository map
+## 🗂️ Repository map
 
 ```text
 arex_v2/                  small stdlib-only CLI and backend adapters
@@ -129,13 +169,14 @@ scripts/                  data preparation, download, and diagnostics
 configs/                  safe configuration examples (no secrets)
 reference/                original runners kept for reproducibility
 docs/                     configuration and per-benchmark scoring guides
+assets/                   logo, icons, and benchmark result artwork
 ```
 
 Runtime data, result directories, credentials, and downloaded problem archives
 are ignored by Git. Upstream notices and source versions are recorded in
 `THIRD_PARTY_NOTICES.md` and `SNAPSHOT.txt`.
 
-## 6. What to inspect after a run
+## ✅ What to inspect after a run
 
 Research runs write one directory per dataset under `--save-path`. Inspect each
 case's `result.json` and aggregate the `score_result.score` values. Keep the
@@ -143,7 +184,7 @@ judge status, `official_scorer`, `judge_raw`, and error fields alongside the
 numeric score. Frontier uses checker case scores; MLE-bench uses the host
 grader. The complete per-task rules are in [docs/evaluation.md](docs/evaluation.md).
 
-## 7. Useful commands
+## 🔧 Useful commands
 
 ```bash
 python3 -m arex_v2 list
