@@ -14,6 +14,8 @@ def command(repo_root: Path, competition: str, *, prepare: bool = False, time_li
         args.append(competition)
     env = os.environ.copy()
     env["TIME_LIMIT_SECS"] = str(time_limit)
+    if prepare:
+        env["ONLY"] = competition
     if dry_run:
         env["AREX_DRY_RUN"] = "1"
     return args, env
