@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/arex-logo.svg" alt="AREX Benchmark" width="760" />
+<img src="assets/arex-official.png" alt="AREX" width="420" />
 
 <p><strong>Unified agent research, search, reasoning, and benchmark evaluation</strong></p>
 
@@ -15,14 +15,19 @@
 
 </div>
 
-> **AREX Benchmark** (formerly AREX v2) means **Agent Research & Evaluation eXchange**. The Python compatibility module remains `arex_v2`, so existing commands continue to work.
+> **AREX Evaluation Suite** packages the research evaluators, data preparation,
+> and benchmark runners in one reproducible entry point. The Python module
+> remains `arex_v2`, so existing commands continue to work.
 
-AREX Benchmark is the single entry point for the evaluation code used by
+AREX Evaluation Suite is the single entry point for the evaluation code used by
 `self_evolving_v15`. It combines the research benchmarks, Frontier-CS
 algorithmic judge, and MLE-bench Lite runner without copying their large or
 licensed datasets into Git.
 
+The logo follows the official [AREX research site](https://arex-research.com/).
+
 - Chinese README: [README.zh-CN.md](README.zh-CN.md)
+- Homepage: [AREX Evaluation Suite](https://545999961.github.io/AREX-v2/)
 - Detailed configuration: [docs/configuration.md](docs/configuration.md)
 - Evaluation and scoring: [docs/evaluation.md](docs/evaluation.md)
 - Original upstream snapshots and licenses: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
@@ -32,7 +37,7 @@ licensed datasets into Git.
 The checked-in chart is the current project comparison snapshot. It is kept as
 an SVG so it stays sharp in the GitHub README and can be downloaded for reports.
 
-![AREX Benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
 
 Scores are only comparable when the model endpoint, task range, tools, and
 judge configuration are recorded with the run. See [Evaluation and scoring](docs/evaluation.md).
@@ -170,6 +175,7 @@ configs/                  safe configuration examples (no secrets)
 reference/                original runners kept for reproducibility
 docs/                     configuration and per-benchmark scoring guides
 assets/                   logo, icons, and benchmark result artwork
+site/                     static homepage and GitHub Pages workflow
 ```
 
 Runtime data, result directories, credentials, and downloaded problem archives

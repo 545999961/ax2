@@ -1,4 +1,4 @@
-AREX Benchmark source snapshots assembled 2026-09-28 from the two archives supplied in
+AREX evaluation-suite source snapshots assembled 2026-09-28 from the two archives supplied in
 `inference/code/`:
 
 - Frontier-CS-Algo-release.zip -> `vendor/frontier_cs/`, `vendor/harbor_pi_supported/`, `algorithmic/`, and `vendor/frontier_run/`.

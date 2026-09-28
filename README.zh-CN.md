@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/arex-logo.svg" alt="AREX Benchmark" width="760" />
+<img src="assets/arex-official.png" alt="AREX" width="420" />
 
 <p><strong>统一的 agent research、搜索、推理与基准评测平台</strong></p>
 
@@ -15,13 +15,17 @@
 
 </div>
 
-> **AREX Benchmark**（原 AREX v2）代表 **Agent Research & Evaluation eXchange**。Python 兼容模块仍然叫 `arex_v2`，已有命令继续有效。
+> **AREX Evaluation Suite** 把 research 评测器、数据准备和多个基准运行器
+> 组织成一个可复现入口。Python 模块仍然叫 `arex_v2`，已有命令继续有效。
 
-AREX Benchmark 是 `self_evolving_v15` 的统一评测入口，把 research 基准、
+AREX Evaluation Suite 是 `self_evolving_v15` 的统一评测入口，把 research 基准、
 Frontier-CS 算法题评测器和 MLE-bench Lite 放在同一个仓库中。大体积、加密
 或受许可限制的数据不会提交到 Git。
 
+logo 使用 [AREX 官方 research 网站](https://arex-research.com/) 的视觉素材。
+
 - English README: [README.md](README.md)
+- 项目主页：[AREX Evaluation Suite](https://545999961.github.io/AREX-v2/)
 - 详细配置：[docs/configuration.zh-CN.md](docs/configuration.zh-CN.md)
 - 评测与计分：[docs/evaluation.zh-CN.md](docs/evaluation.zh-CN.md)
 - 上游版本和许可证：[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
@@ -31,7 +35,7 @@ Frontier-CS 算法题评测器和 MLE-bench Lite 放在同一个仓库中。大�
 仓库内置当前项目的 benchmark 对比图，并以 SVG 保存，GitHub 页面上可以
 保持清晰，也方便下载到报告中使用。
 
-![AREX Benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
 
 只有在 model endpoint、任务范围、工具和 judge 配置一致时，分数才具有可比性。
 详见[评测和计分](docs/evaluation.zh-CN.md)。
@@ -165,6 +169,7 @@ configs/                  安全的配置示例（不含密钥）
 reference/                为复现保留的原始 runner
 docs/                     配置和各基准计分说明
 assets/                   logo、图标和 benchmark 效果图
+site/                     静态项目主页和 GitHub Pages 工作流
 ```
 
 运行数据、结果目录、凭据和下载的题目都会被 Git 忽略。上游许可和版本记录在

@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="AREX evaluation suite for deep research agents and benchmark runners." />
+  <meta name="theme-color" content="#0b0b0c" />
+  <link rel="icon" href="assets/arex-favicon.ico" />
+  <link rel="stylesheet" href="styles.css" />
+  <title>AREX · Evaluation Suite</title>
+</head>
+<body>
+  <header class="topbar" id="top">
+    <a class="brand" href="#top" aria-label="AREX home">
+      <img src="assets/arex-official.png" alt="AREX" />
+    </a>
+    <nav class="nav" aria-label="Primary navigation">
+      <a href="#results" data-section="results">Results</a>
+      <a href="#workflow" data-section="workflow">Workflow</a>
+      <a href="#benchmarks" data-section="benchmarks">Benchmarks</a>
+      <a href="#quickstart" data-section="quickstart">Quick start</a>
+    </nav>
+    <a class="nav-cta" href="https://github.com/545999961/AREX-v2">View GitHub <span aria-hidden="true">↗</span></a>
+  </header>
+
+  <main>
+    <section class="hero shell">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="pulse"></span> EVALUATION INFRASTRUCTURE · 2026</p>
+        <h1>Research.<br /><em>Verify.</em><br />Run the next one.</h1>
+        <p class="lede">A focused evaluation suite for agents that search, reason, use tools, and turn evidence into an answer.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#quickstart">Run a smoke test <span>→</span></a>
+          <a class="button button-quiet" href="#results">See the results <span>↓</span></a>
+        </div>
+      </div>
+      <div class="hero-panel" aria-label="AREX run overview">
+        <div class="panel-chrome"><span></span><span></span><span></span><code>arex / run</code><b>READY</b></div>
+        <div class="run-title"><span class="run-index">01</span><div><strong>BrowseComp</strong><small>research / direct / 10 tasks</small></div></div>
+        <div class="run-line"><span>model</span><strong>provider/model-name</strong><i>configured</i></div>
+        <div class="run-line"><span>search</span><strong>Serper</strong><i>connected</i></div>
+        <div class="run-line"><span>visit</span><strong>Jina Reader</strong><i>connected</i></div>
+        <div class="run-line"><span>judge</span><strong>official scorer</strong><i>queued</i></div>
+        <div class="mini-chart"><span style="height: 27%"></span><span style="height: 43%"></span><span style="height: 35%"></span><span style="height: 65%"></span><span style="height: 54%"></span><span style="height: 80%"></span><span style="height: 72%"></span><span style="height: 92%"></span><span style="height: 86%"></span><span style="height: 100%"></span></div>
+        <div class="panel-footer"><span>save path</span><strong>runs/browsecomp-10</strong></div>
+      </div>
+    </section>
+
+    <section class="ticker" aria-label="Evaluation capabilities">
+      <div class="ticker-track"><span>SEARCH</span><b>✦</b><span>REASON</span><b>✦</b><span>VERIFY</span><b>✦</b><span>REPEAT</span><b>✦</b><span>SEARCH</span><b>✦</b><span>REASON</span><b>✦</b><span>VERIFY</span><b>✦</b><span>REPEAT</span></div>
+    </section>
+
+    <section class="section shell" id="results">
+      <div class="section-heading"><p class="eyebrow">01 · RESULTS</p><h2>One view of the<br /><em>evaluation surface.</em></h2><p class="section-intro">Run one benchmark or several with the same endpoint configuration, task range, and output contract.</p></div>
+      <div class="results-card"><div class="card-label"><span>AREX / BENCHMARK SNAPSHOT</span><span>↑ HIGHER IS BETTER</span></div><img src="assets/performance/arex-v2-benchmark-results.svg" alt="AREX benchmark results across research evaluations" /></div>
+      <p class="caption">The chart is a project-provided comparison snapshot. Record model, tools, judge, task range, and data revision alongside every run.</p>
+    </section>
+
+    <section class="section section-dark" id="workflow">
+      <div class="shell">
+        <div class="section-heading light"><p class="eyebrow">02 · WORKFLOW</p><h2>Small interface.<br /><em>Clear state.</em></h2><p class="section-intro">The public entry point stays compact. The underlying evaluators keep their native benchmark behavior.</p></div>
+        <div class="workflow-grid">
+          <article class="workflow-step"><div class="step-number">01</div><h3>Select</h3><p>Choose a dataset and a task count. Use an index range for partial or repeatable runs.</p><code>research BrowseComp --n 10</code></article>
+          <article class="workflow-step"><div class="step-number">02</div><h3>Research</h3><p>Let the agent search with Serper, read pages through Jina, and write a trace for each case.</p><code>SERP → READ → ANSWER</code></article>
+          <article class="workflow-step"><div class="step-number">03</div><h3>Judge</h3><p>Run the benchmark scorer and retain the score, status, raw judge output, and errors.</p><code>score_result.json</code></article>
+          <article class="workflow-step"><div class="step-number">04</div><h3>Inspect</h3><p>Compare runs only when model, tools, data, and judge configuration are held constant.</p><code>runs/&lt;dataset&gt;/...</code></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section shell" id="benchmarks">
+      <div class="section-heading"><p class="eyebrow">03 · BENCHMARKS</p><h2>Built for the work<br />that takes <em>evidence.</em></h2></div>
+      <div class="benchmark-grid">
+        <article class="benchmark-card featured"><div class="benchmark-top"><span class="benchmark-icon">⌁</span><span>RESEARCH</span></div><h3>BrowseComp</h3><p>Encrypted web-browsing questions scored with the official judge.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#research-datasets">Scoring notes <span>↗</span></a></article>
+        <article class="benchmark-card"><div class="benchmark-top"><span class="benchmark-icon">◌</span><span>RESEARCH</span></div><h3>HLE</h3><p>Humanity’s Last Exam through the 0724 harness and judge.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#research-datasets">Scoring notes <span>↗</span></a></article>
+        <article class="benchmark-card"><div class="benchmark-top"><span class="benchmark-icon">◇</span><span>RESEARCH</span></div><h3>GAIA Text-103</h3><p>Text-only GAIA validation with leak filtering and LLM judging.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#research-datasets">Scoring notes <span>↗</span></a></article>
+        <article class="benchmark-card"><div class="benchmark-top"><span class="benchmark-icon">▦</span><span>RESEARCH</span></div><h3>DeepSearch-QA</h3><p>Multi-step information seeking with the official autorater style.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#research-datasets">Scoring notes <span>↗</span></a></article>
+        <article class="benchmark-card"><div class="benchmark-top"><span class="benchmark-icon">⌘</span><span>CODE</span></div><h3>Frontier-CS</h3><p>C++17 algorithmic evaluation against checker-backed hidden cases.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#frontier-cs-algorithmic">Scoring notes <span>↗</span></a></article>
+        <article class="benchmark-card"><div class="benchmark-top"><span class="benchmark-icon">▱</span><span>ML</span></div><h3>MLE-bench Lite</h3><p>Competition runs with host-side grading and submission artifacts.</p><a href="https://github.com/545999961/AREX-v2/blob/master/docs/evaluation.md#mle-bench-lite">Scoring notes <span>↗</span></a></article>
+      </div>
+    </section>
+
+    <section class="section section-accent" id="quickstart">
+      <div class="shell quick-grid">
+        <div><p class="eyebrow">04 · QUICK START</p><h2>From clone to<br /><em>first signal.</em></h2><p class="section-intro">Prepare data, configure the endpoint, then make the first run deliberately small.</p><a class="button button-light" href="https://github.com/545999961/AREX-v2/blob/master/README.md#-quick-start">Read the full guide <span>↗</span></a></div>
+        <div class="terminal" aria-label="Quick start terminal command"><div class="terminal-head"><span></span><span></span><span></span><b>arex-terminal</b><button id="copy-command" type="button">copy</button></div><pre><span class="muted"># install and prepare</span>
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[research]'
+python3 -m arex_v2 download --all
+
+<span class="muted"># run five tasks</span>
+python3 -m arex_v2 research BrowseComp \
+  --n 5 --save-path runs/smoke</pre><div class="copy-status" id="copy-status" aria-live="polite"></div></div>
+      </div>
+    </section>
+
+    <section class="section shell config-section">
+      <div class="config-copy"><p class="eyebrow">CONFIGURE ONCE</p><h2>Keep the secret<br /><em>out of the run.</em></h2><p class="section-intro">Model name, key environment variable, base URL, and local tokenizer are explicit. Search and visit credentials remain environment-only.</p></div>
+      <div class="config-list"><div><span>MODEL</span><strong>AREX_MODEL_NAME</strong></div><div><span>KEY</span><strong>MODEL_API_KEY</strong></div><div><span>SEARCH</span><strong>SERPER_API_KEY</strong></div><div><span>VISIT</span><strong>JINA_API_KEY</strong></div></div>
+    </section>
+  </main>
+
+  <footer class="footer shell"><img src="assets/arex-official.png" alt="AREX" /><span>Evaluation suite · reproducible runs · benchmark evidence</span><a href="#top">Back to top ↑</a></footer>
+  <script src="app.js"></script>
+</body>
+</html>

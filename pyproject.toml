@@ -3,11 +3,15 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "arex-benchmark"
+name = "arex-evaluation-suite"
 version = "0.1.0"
-description = "AREX Benchmark: unified agent research, algorithmic, and MLE evaluation"
+description = "AREX evaluation suite for research, algorithmic, and MLE benchmarks"
 requires-python = ">=3.10"
 dependencies = []
+
+[project.urls]
+Homepage = "https://545999961.github.io/AREX-v2/"
+Repository = "https://github.com/545999961/AREX-v2"
 
 [project.optional-dependencies]
 research = ["openai", "httpx", "requests", "pandas", "pyarrow", "huggingface_hub", "pillow", "pypdf", "rich", "transformers"]

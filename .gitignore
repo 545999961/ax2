@@ -16,3 +16,6 @@ vendor/research/hle_0724_vendor/data_json/*.jsonl
 .env.*
 !.env.example
 *.egg-info/
+
+# GitHub Pages copies the repository assets into this directory during CI.
+site/assets/
