@@ -11,22 +11,29 @@ from .backends import frontier, mle, research
 
 ROOT = Path(__file__).resolve().parents[1]
 
-RESEARCH_DATASETS = [
-    "BrowseComp",
-    "HLE",
-    "GAIA-2023-validation-text-103",
-    "DeepSearch-QA",
-    "xBench-DeepSearch-2510",
-    "HLE-NoTool",
-    "WideSearch-en",
-    "WideSearch-zh-en-prompt",
-    "WideSearch-en-sft-eval",
-    "WideSearch-zh-sft-eval",
-    "DeepWideSearch",
-    "MoNaCo",
-    "DeepResearch-Bench",
-    "BrowseComp-Zh-official-en-prompt",
-]
+from .datasets import CATALOG, canonical_name, research_names
+
+
+def dataset_name(value: str) -> str:
+    try:
+        return canonical_name(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(str(exc)) from exc
+
+
+def positive(value: str) -> int:
+    number = int(value)
+    if number <= 0:
+        raise argparse.ArgumentTypeError("must be greater than zero")
+    return number
+
+
+def nonnegative(value: str) -> int:
+    number = int(value)
+    if number < 0:
+        raise argparse.ArgumentTypeError("must be zero or greater")
+    return number
+
 
 
 def _run(args: list[str], env: dict[str, str], dry_run: bool) -> int:
@@ -59,31 +66,48 @@ def build_parser() -> argparse.ArgumentParser:
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="check the assembled repository")
     sub.add_parser("list", help="list available backends")
-    p = sub.add_parser("research", help="run one or more research datasets")
-    p.add_argument("dataset", nargs="+", choices=RESEARCH_DATASETS, metavar="DATASET")
+    p = sub.add_parser("download", help="download and prepare benchmark data")
+    p.add_argument("dataset", nargs="*", help="core research datasets or algorithmic; default: all core research datasets")
+    p.add_argument("--dataset", dest="dataset_option", help="compatibility alias for one dataset")
+    p.add_argument("--all", action="store_true", help="include the large algorithmic archive")
+    p.add_argument("--data-root", default="")
+    p.add_argument("--revision", default="main", help="Hugging Face dataset revision")
+    p.add_argument("--force", action="store_true", help="refresh existing prepared research data")
+    p.add_argument("--list", action="store_true")
+    p.add_argument("--dry-run", action="store_true")
+    p = sub.add_parser("research", aliases=["eval"], help="run one or more research datasets")
+    p.add_argument("dataset", nargs="+", type=dataset_name, metavar="DATASET")
     p.add_argument("--mode", default="direct", choices=["direct", "refine_summary", "return"])
-    p.add_argument("--model", "--model-name", dest="model", default="")
+    p.add_argument("--model", "--model-name", dest="model", default=os.environ.get("AREX_MODEL_NAME", ""))
     p.add_argument(
         "--api-key-env",
-        default="API_KEY",
+        default=os.environ.get("AREX_API_KEY_ENV", "API_KEY"),
         help="environment variable containing the model API key (never printed or passed as a CLI value)",
     )
     p.add_argument(
         "--base-url",
-        default="",
+        default=os.environ.get("AREX_BASE_URL", os.environ.get("BASE_URL", "")),
         help="OpenAI-compatible base URL for the model endpoint",
     )
     p.add_argument("--data-path", default="")
-    p.add_argument("--save-path", default="")
+    p.add_argument("--save-path", default="", help="default: runs/<timestamp>")
+    p.add_argument("--data-root", default="")
+    p.add_argument("--tokenizer-path", default=os.environ.get("AREX_TOKENIZER_PATH", ""))
+    p.add_argument("--concurrency", type=positive, default=4)
+    p.add_argument("--shuffle", action="store_true", help="use the legacy benchmark sampling order")
+    for role in ("judge", "summary"):
+        p.add_argument(f"--{role}-model", default=os.environ.get(f"AREX_{role.upper()}_MODEL", ""))
+        p.add_argument(f"--{role}-base-url", default=os.environ.get(f"AREX_{role.upper()}_BASE_URL", ""))
+        p.add_argument(f"--{role}-api-key-env", default=os.environ.get(f"AREX_{role.upper()}_API_KEY_ENV", ""))
     p.add_argument(
         "--n",
         "--num-tasks",
         dest="num_tasks",
-        type=int,
+        type=positive,
         default=None,
         help="evaluate the first N rows (or N rows after --start-index)",
     )
-    p.add_argument("--start-index", type=int, default=0, help="zero-based first row to evaluate")
+    p.add_argument("--start-index", type=nonnegative, default=0, help="zero-based first row to evaluate")
     p.add_argument("--dry-run", action="store_true")
     p.add_argument("--extra", action="append", default=[], help="pass an extra evaluator flag (repeatable)")
     p = sub.add_parser("algorithmic", help="Frontier-CS C++ solution evaluation")
@@ -101,29 +125,44 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> None:
-    ns = build_parser().parse_args(argv)
+    parser = build_parser()
+    ns = parser.parse_args(argv)
     if ns.command == "doctor":
         raise SystemExit(doctor(ns))
+    if ns.command == "download":
+        from .prepare import run
+        if ns.dataset_option:
+            ns.dataset.append(ns.dataset_option)
+        try:
+            ns.dataset = ["algorithmic" if v.lower() == "algorithmic" else canonical_name(v) for v in ns.dataset]
+            for name in ns.dataset:
+                if name not in CATALOG and name != "algorithmic":
+                    raise ValueError(f"{name} uses manual data preparation; see docs/evaluation.md")
+        except ValueError as exc:
+            parser.error(str(exc))
+        raise SystemExit(run(ns))
     if ns.command == "list":
-        print("research: " + ", ".join(RESEARCH_DATASETS))
+        print("research: " + ", ".join(research_names()))
         print("algorithmic: Frontier-CS algorithmic problems (C++17)")
         print("mle: MLE-bench Lite competitions through vendor/mle_lite")
         return
-    if ns.command == "research":
-        args, env = research.command(
-            ROOT,
-            ns.dataset,
-            mode=ns.mode,
-            model=ns.model,
-            api_key_env=ns.api_key_env,
-            base_url=ns.base_url,
-            data_path=ns.data_path,
-            save_path=ns.save_path,
-            num_tasks=ns.num_tasks,
-            start_index=ns.start_index,
-            dry_run=ns.dry_run,
-            extra=ns.extra,
-        )
+    if ns.command in ("research", "eval"):
+        try:
+            args, env = research.command(
+                ROOT, ns.dataset, mode=ns.mode, model=ns.model,
+                api_key_env=ns.api_key_env, base_url=ns.base_url,
+                data_path=ns.data_path, save_path=ns.save_path,
+                data_root=ns.data_root, tokenizer_path=ns.tokenizer_path,
+                num_tasks=ns.num_tasks, start_index=ns.start_index,
+                concurrency=ns.concurrency, shuffle=ns.shuffle,
+                judge_model=ns.judge_model, judge_base_url=ns.judge_base_url,
+                judge_api_key_env=ns.judge_api_key_env,
+                summary_model=ns.summary_model, summary_base_url=ns.summary_base_url,
+                summary_api_key_env=ns.summary_api_key_env,
+                dry_run=ns.dry_run, extra=ns.extra,
+            )
+        except ValueError as exc:
+            parser.error(str(exc))
         raise SystemExit(_run(args, env, ns.dry_run))
     if ns.command == "algorithmic":
         args, env = frontier.command(ROOT, ns.problem, ns.solution, backend=ns.backend, judge_url=ns.judge_url, dry_run=ns.dry_run)

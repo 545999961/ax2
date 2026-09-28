@@ -1394,26 +1394,26 @@ async def run_all(args) -> None:
         sum_tokenizer = tokenizer if not args.sum_tokenizer_path else import_tokenizer(args.sum_tokenizer_path)
         llm_client = create_async_openai_with_retry(
             api_key=args.sdk_api_key,
-            base_url=args.sdk_base_url,
+            base_url=args.sdk_base_url or None,
             timeout=600,
             general_max_attempts=args.general_max_attempts,
         )
         summary_client = create_async_openai_with_retry(
             api_key=args.summary_api_key or args.sdk_api_key,
-            base_url=args.summary_base_url,
+            base_url=args.summary_base_url or args.sdk_base_url or None,
             timeout=600,
             general_max_attempts=args.general_max_attempts,
         )
         judge_client = create_async_openai_with_retry(
             api_key=args.judge_api_key or args.summary_api_key or args.sdk_api_key,
-            base_url=args.judge_base_url or args.summary_base_url,
+            base_url=args.judge_base_url or args.summary_base_url or args.sdk_base_url or None,
             timeout=600,
             general_max_attempts=args.general_max_attempts,
         )
         if args.direct_repair_judge_base_url or args.direct_repair_judge_api_key or args.direct_repair_judge_model:
             repair_judge_client = create_async_openai_with_retry(
                 api_key=args.direct_repair_judge_api_key or args.judge_api_key or args.summary_api_key or args.sdk_api_key,
-                base_url=args.direct_repair_judge_base_url or args.judge_base_url or args.summary_base_url,
+                base_url=args.direct_repair_judge_base_url or args.judge_base_url or args.summary_base_url or args.sdk_base_url or None,
                 timeout=600,
                 general_max_attempts=args.general_max_attempts,
             )
@@ -1648,7 +1648,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--preserve_thinking", action="store_true")
     parser.add_argument("--tokenizer_path", type=str, default="")
     parser.add_argument("--summary_base_url", type=str, default="")
-    parser.add_argument("--summary_api_key", type=str, default="")
+    parser.add_argument("--summary_api_key", type=str, default=os.environ.get("AREX_SUMMARY_API_KEY", ""))
     parser.add_argument("--summary_model", type=str, default="")
     parser.add_argument("--sum_tokenizer_path", type=str, default="")
     summary_thinking_group = parser.add_mutually_exclusive_group()
@@ -1684,7 +1684,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.set_defaults(enable_visit_fallback=visit_fallback_default_enabled())
     parser.add_argument("--judge_base_url", type=str, default="")
-    parser.add_argument("--judge_api_key", type=str, default="")
+    parser.add_argument("--judge_api_key", type=str, default=os.environ.get("AREX_JUDGE_API_KEY", ""))
     parser.add_argument("--judge_model", type=str, default="")
     parser.add_argument("--judge-mode", "--judge_mode", dest="judge_mode", type=str, default="local", choices=["local", "offical", "official"])
 
@@ -1989,14 +1989,19 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
+def redacted_args(args) -> dict:
+    return {key: ("[REDACTED]" if "api_key" in key and value else value)
+            for key, value in vars(args).items()}
+
+
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
     pretty = get_pretty_console()
     if pretty.enabled:
-        pretty.panel("Args", json.dumps(vars(args), ensure_ascii=False, indent=2), style="bright_black")
+        pretty.panel("Args", json.dumps(redacted_args(args), ensure_ascii=False, indent=2), style="bright_black")
     else:
-        print(vars(args))
+        print(redacted_args(args))
     asyncio.run(run_all(args))
 
 

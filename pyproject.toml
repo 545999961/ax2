@@ -10,9 +10,9 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.optional-dependencies]
-research = ["openai", "httpx", "requests", "pandas", "pyarrow", "pillow", "pypdf", "rich", "transformers"]
+research = ["openai", "httpx", "requests", "pandas", "pyarrow", "huggingface_hub", "pillow", "pypdf", "rich", "transformers"]
 frontier = ["pyyaml", "requests", "openai", "anthropic", "datasets", "tqdm"]
-all = ["openai", "httpx", "requests", "pandas", "pyarrow", "pillow", "pypdf", "rich", "transformers", "pyyaml", "anthropic", "datasets", "tqdm"]
+all = ["openai", "httpx", "requests", "pandas", "pyarrow", "huggingface_hub", "pillow", "pypdf", "rich", "transformers", "pyyaml", "anthropic", "datasets", "tqdm"]
 
 [project.scripts]
 arex = "arex_v2.cli:main"

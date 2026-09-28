@@ -15,6 +15,7 @@ research DATASET [DATASET ...]
   --api-key-env ENV_NAME    name of the environment variable holding the key
   --base-url URL             OpenAI-compatible model endpoint
   --data-path PATH          override the data file (one dataset only)
+  --data-root PATH          prepared data root (default: ./data)
   --save-path PATH          result root
   --extra FLAG              pass one evaluator-specific flag; repeat it
 ```
@@ -44,6 +45,8 @@ the secret is never appended to the command preview. `--model-name` and
 | `SERPER_SCHOLAR_API_URL` | Serper Scholar adapter | custom Scholar endpoint |
 | `JINA_API_URL` | Jina adapter | custom Reader endpoint |
 | `MLE_BENCH` | MLE-bench Lite | MLE prepare/run |
+| `HF_TOKEN` | Hugging Face gated downloader | HLE/GAIA preparation after access approval |
+| `AREX_TOKENIZER_PATH` | local tokenizer | research token counting |
 | provider-specific keys | Frontier/MLE adapters | according to the selected backend |
 
 `configs/model.env.example` contains names and placeholders only. Keep real
@@ -51,15 +54,17 @@ values in a local ignored file or a secret manager.
 
 ## Dataset paths
 
-The default research paths are defined in
+The canonical prepared paths are under `data/`; legacy paths in
+`vendor/research/datasets/` remain accepted when `--data-root` is omitted. The
+dataset defaults are defined in
 `vendor/research/dataset_configs/*/config.json`:
 
 | Dataset | Default input |
 | --- | --- |
-| BrowseComp | `vendor/research/datasets/BrowseComp/browse_comp_test_set.csv` |
-| HLE | `vendor/research/hle_0724_vendor/data_json/text_items.jsonl` |
-| GAIA-2023-validation-text-103 | `vendor/research/datasets/GAIA/2023/validation-text-103/standardized_data.jsonl` |
-| DeepSearch-QA | `vendor/research/datasets/DeepSearch-QA/DSQA-full.csv` |
+| BrowseComp | `data/BrowseComp/browse_comp_test_set.csv` |
+| HLE | `data/HLE/text_items.jsonl` |
+| GAIA-2023-validation-text-103 | `data/GAIA-2023-validation-text-103/standardized_data.jsonl` |
+| DeepSearch-QA | `data/DeepSearch-QA/DSQA-full.csv` |
 
 Use `--data-path` for one selected dataset. The evaluator rejects a single path
 override for a multi-dataset run rather than applying the wrong file to every

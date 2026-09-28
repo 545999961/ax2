@@ -1,7 +1,7 @@
 """Credential-free configuration for the web tools used by research tasks.
 
-The adapters default to the existing batch proxy endpoints. Set the URL variables to
-use the public providers directly: ``https://google.serper.dev/search`` (or
+The adapters default to the public providers. URL variables support custom
+endpoints: ``https://google.serper.dev/search`` (or
 ``/scholar``) and ``https://r.jina.ai``. Secrets are read only from the environment.
 """
 
@@ -11,13 +11,13 @@ import os
 from urllib.parse import urlparse
 
 SERPER_API_URL = os.environ.get(
-    "SERPER_API_URL", "http://api1.rag.ac.cn/serp_search_v1"
+    "SERPER_API_URL", "https://google.serper.dev/search"
 ).strip()
 SERPER_SCHOLAR_API_URL = os.environ.get(
     "SERPER_SCHOLAR_API_URL", "https://google.serper.dev/scholar"
 ).strip()
 JINA_API_URL = os.environ.get(
-    "JINA_API_URL", "http://api1.rag.ac.cn/visit_pages_v1"
+    "JINA_API_URL", "https://r.jina.ai"
 ).strip()
 SERPER_API_KEY = (
     os.environ.get("SERPER_API_KEY") or os.environ.get("SERPER_KEY") or ""

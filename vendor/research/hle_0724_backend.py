@@ -173,7 +173,8 @@ class HLE0724Backend:
             timeout=float(self.config.get("hle_judge_timeout", 600)),
             max_retries=int(self.config.get("hle_judge_max_retries", 0)),
             base_url=self.config.get("judge_base_url")
-            or self.config.get("summary_base_url"),
+            or self.config.get("summary_base_url")
+            or self.config.get("sdk_base_url") or None,
             api_key=self.config.get("judge_api_key")
             or self.config.get("summary_api_key")
             or self.config.get("sdk_api_key"),
@@ -307,6 +308,7 @@ class HLE0724Backend:
                 use_local_endpoint=self.judge_module._is_local_endpoint(
                     self.config.get("judge_base_url")
                     or self.config.get("summary_base_url")
+                    or self.config.get("sdk_base_url")
                 ),
                 truncate_response_token_threshold=int(
                     self.config.get("hle_judge_truncate_response_token_threshold", 100000)

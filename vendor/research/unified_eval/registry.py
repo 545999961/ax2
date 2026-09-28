@@ -114,7 +114,11 @@ def load_dataset_spec(
     raw = _merge_dataset_modules(config_dir, _load_json_file(config_path), judge_mode)
 
     raw.setdefault("name", name)
-    raw["data_path"] = _resolve_path(data_path_override or raw["data_path"])
+    prepared_paths = json.loads(os.environ.get("AREX_DATA_PATHS", "{}"))
+    prepared_path = data_path_override or prepared_paths.get(name)
+    raw["data_path"] = _resolve_path(prepared_path or raw["data_path"])
+    if prepared_path and raw.get("attachments_root"):
+        raw["attachments_root"] = str(Path(raw["data_path"]).parent)
     for key in ("gold_root", "criteria_path", "reference_path", "attachments_root", "include_ids_path"):
         if raw.get(key):
             raw[key] = _resolve_path(raw[key])

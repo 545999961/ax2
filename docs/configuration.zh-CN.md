@@ -14,6 +14,7 @@ research DATASET [DATASET ...]
   --api-key-env ENV_NAME    保存 key 的环境变量名
   --base-url URL             OpenAI 兼容模型端点
   --data-path PATH          覆盖数据文件（只选择一个数据集时）
+  --data-root PATH          准备好的数据根目录（默认 ./data）
   --save-path PATH          结果根目录
   --extra FLAG              传递一个评测器高级参数，可重复
 ```
@@ -41,6 +42,8 @@ python3 -m arex_v2 research BrowseComp \
 | `SERPER_SCHOLAR_API_URL` | Serper Scholar 适配器 | 自定义 Scholar 端点 |
 | `JINA_API_URL` | Jina 适配器 | 自定义 Reader 端点 |
 | `MLE_BENCH` | MLE-bench Lite | prepare/run |
+| `HF_TOKEN` | Hugging Face gated downloader | 获得许可后准备 HLE/GAIA |
+| `AREX_TOKENIZER_PATH` | 本地 tokenizer | research token 计算 |
 | 后端专用 key | Frontier/MLE 适配器 | 按所选后端要求 |
 
 `configs/model.env.example` 只有变量名和占位符。真实值放在本地被忽略的文件
@@ -48,14 +51,16 @@ python3 -m arex_v2 research BrowseComp \
 
 ## 数据集路径
 
-默认 research 路径定义在 `vendor/research/dataset_configs/*/config.json`：
+规范路径在 `data/` 下；不传 `--data-root` 时仍兼容
+`vendor/research/datasets/` 中的旧路径。数据集配置定义在
+`vendor/research/dataset_configs/*/config.json`：
 
 | 数据集 | 默认输入 |
 | --- | --- |
-| BrowseComp | `vendor/research/datasets/BrowseComp/browse_comp_test_set.csv` |
-| HLE | `vendor/research/hle_0724_vendor/data_json/text_items.jsonl` |
-| GAIA-2023-validation-text-103 | `vendor/research/datasets/GAIA/2023/validation-text-103/standardized_data.jsonl` |
-| DeepSearch-QA | `vendor/research/datasets/DeepSearch-QA/DSQA-full.csv` |
+| BrowseComp | `data/BrowseComp/browse_comp_test_set.csv` |
+| HLE | `data/HLE/text_items.jsonl` |
+| GAIA-2023-validation-text-103 | `data/GAIA-2023-validation-text-103/standardized_data.jsonl` |
+| DeepSearch-QA | `data/DeepSearch-QA/DSQA-full.csv` |
 
 只选择一个数据集时可用 `--data-path`。多数据集运行传入单一路径会直接报错，
 避免把同一个文件错误地应用到所有数据集。

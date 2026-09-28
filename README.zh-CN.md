@@ -30,13 +30,15 @@ python3 -m arex_v2 doctor
 ```bash
 python3 scripts/download_data.py --all
 python3 scripts/download_data.py --list
+# 等价的模块命令：
+python3 -m arex_v2 download --all
 ```
 
 该命令会把公开的 Frontier-CS 题面和测试数据下载到
-`algorithmic/problems/`。research 数据集会由 `--list` 列出状态，但不会被
-脚本猜测 URL 自动下载：BrowseComp、HLE 含加密或授权材料，GAIA 和
-DeepSearch-QA 需要从各自的基准发布渠道获取。把文件放到 `--list` 打印的
-路径，或者对单个数据集使用 `--data-path`。
+`algorithmic/problems/`，并把核心 research 数据准备到 `data/`。BrowseComp
+和 DeepSearch-QA 有公开发布文件；HLE、GAIA 需要先接受 Hugging Face 的 gated
+条款并设置 `HF_TOKEN`。如果 gated 数据暂时不能下载，命令会报告缺失项，已
+完成的下载不会丢失；用 `--list` 查看状态。
 
 需要固定 Frontier 镜像并校验压缩包时：
 
@@ -51,6 +53,8 @@ python3 scripts/download_algorithmic.py \
 research 的常用命令只需要数据集名称和任务数：
 
 ```bash
+cp configs/model.env.example .env  # 先填写 model/key/tokenizer
+set -a; source .env; set +a
 python3 -m arex_v2 research BrowseComp --n 10 --dry-run
 python3 -m arex_v2 research BrowseComp --n 10 \
   --model provider/model-name \
@@ -92,6 +96,10 @@ MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
 API key 的值只从环境变量读取，不会进入命令行参数、日志或仓库。可以复制
 `configs/model.env.example` 到本地被忽略的文件来管理变量。评测器内部使用
 `AREX_SDK_API_KEY`、`AREX_SDK_BASE_URL` 和 `AREX_MODEL_NAME`。
+
+agent 还需要一个本地 tokenizer 来计算 token 数。请在示例文件中设置
+`AREX_TOKENIZER_PATH`，或加上 `--tokenizer-path PATH`；它和服务端 model
+endpoint 是两套独立配置。
 
 research 工具使用固定协议：
 
@@ -136,6 +144,7 @@ python3 -m arex_v2 list
 python3 -m arex_v2 doctor
 python3 scripts/download_data.py --list
 python3 -m arex_v2 research BrowseComp --n 1 --dry-run
+python3 -m arex_v2 download DeepSearch-QA --dry-run
 ```
 
 不要提交基准数据、API key、模型输出或本地 `.env` 文件。

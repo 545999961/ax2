@@ -33,14 +33,16 @@ python3 -m arex_v2 doctor
 ```bash
 python3 scripts/download_data.py --all
 python3 scripts/download_data.py --list
+# equivalent module form:
+python3 -m arex_v2 download --all
 ```
 
 The command downloads the public Frontier-CS problem archive into
-`algorithmic/problems/`. Research datasets are shown by `--list` but are not
-silently fetched: BrowseComp and HLE contain encrypted or licensed material,
-and GAIA/DeepSearch-QA are distributed through their respective benchmark
-channels. Put those files at the paths printed by `--list`, or pass a single
-dataset-specific file with `--data-path`.
+`algorithmic/problems/` and prepares the core research datasets under `data/`.
+BrowseComp and DeepSearch-QA have public publisher files; HLE and GAIA require
+accepting their gated Hugging Face terms and setting `HF_TOKEN`. If a gated
+download is unavailable, the command reports the missing dataset and leaves
+all already completed downloads intact. Use `--list` to see the current state.
 
 To pin a Frontier mirror and verify its archive:
 
@@ -55,6 +57,8 @@ python3 scripts/download_algorithmic.py \
 The normal research command only needs a dataset name and a task count:
 
 ```bash
+cp configs/model.env.example .env  # edit model/key/tokenizer values first
+set -a; source .env; set +a
 python3 -m arex_v2 research BrowseComp --n 10 --dry-run
 python3 -m arex_v2 research BrowseComp --n 10 \
   --model provider/model-name \
@@ -96,6 +100,10 @@ The API key value is read from the environment and never put in argv, logs, or
 the repository. Copy `configs/model.env.example` to a local ignored file if it
 helps organize the variables. The evaluator uses `AREX_SDK_API_KEY`,
 `AREX_SDK_BASE_URL`, and `AREX_MODEL_NAME` internally.
+
+The agent also needs a local tokenizer for token counting. Set
+`AREX_TOKENIZER_PATH` in the example file or add `--tokenizer-path PATH`; this
+is independent of the served model endpoint.
 
 Research tools have a separate fixed contract:
 
@@ -142,6 +150,7 @@ python3 -m arex_v2 list
 python3 -m arex_v2 doctor
 python3 scripts/download_data.py --list
 python3 -m arex_v2 research BrowseComp --n 1 --dry-run
+python3 -m arex_v2 download DeepSearch-QA --dry-run
 ```
 
 Do not commit benchmark files, API keys, model outputs, or local `.env` files.

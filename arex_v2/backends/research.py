@@ -1,60 +1,79 @@
 from __future__ import annotations
 
+import datetime
+import json
 import os
 import sys
 from pathlib import Path
 
+from ..datasets import CATALOG, data_root as resolve_data_root, dataset_paths
+
 
 def command(
-    repo_root: Path,
-    datasets: str | list[str],
-    *,
-    mode: str = "direct",
-    model: str = "",
-    api_key_env: str = "API_KEY",
-    base_url: str = "",
-    data_path: str = "",
-    save_path: str = "",
-    num_tasks: int | None = None,
-    start_index: int = 0,
-    dry_run: bool = False,
-    extra: list[str] | None = None,
+    repo_root: Path, datasets: str | list[str], *, mode: str = "direct",
+    model: str = "", api_key_env: str = "API_KEY", base_url: str = "",
+    data_path: str = "", save_path: str = "", data_root: str = "",
+    tokenizer_path: str = "", num_tasks: int | None = None, start_index: int = 0,
+    concurrency: int = 4, shuffle: bool = False,
+    judge_model: str = "", judge_base_url: str = "", judge_api_key_env: str = "",
+    summary_model: str = "", summary_base_url: str = "", summary_api_key_env: str = "",
+    dry_run: bool = False, extra: list[str] | None = None,
 ) -> tuple[list[str], dict[str, str]]:
-    script = repo_root / "vendor" / "research" / "eval_unified.py"
-    if not script.is_file():
-        raise FileNotFoundError(script)
-    selected = [datasets] if isinstance(datasets, str) else list(datasets)
-    if not selected or any(not item for item in selected):
-        raise ValueError("at least one research dataset is required")
-    if start_index < 0:
-        raise ValueError("start_index must be zero or greater")
-    args = [sys.executable, str(script), "--datasets", *selected, "--mode", mode]
-    if model:
-        args += ["--model", model]
+    selected = list(dict.fromkeys([datasets] if isinstance(datasets, str) else datasets))
+    if not selected or start_index < 0 or (num_tasks is not None and num_tasks <= 0):
+        raise ValueError("select a dataset, a nonnegative start index, and a positive task count")
+    if data_path and len(selected) != 1:
+        raise ValueError("--data-path requires exactly one dataset; use --data-root for multiple datasets")
+    env = os.environ.copy()
+    root = resolve_data_root(data_root)
+    paths = dataset_paths(root, selected, use_legacy=not (data_root or env.get("AREX_DATA_ROOT")))
     if data_path:
-        args += ["--data_path", data_path]
-    if save_path:
-        args += ["--save_path", save_path]
-    if start_index:
-        args += ["--start_index", str(start_index)]
-    if num_tasks is not None:
-        if num_tasks <= 0:
-            raise ValueError("num_tasks must be greater than zero")
-        args += ["--end_index", str(start_index + num_tasks)]
+        paths[selected[0]] = str(Path(data_path).expanduser().resolve())
+    if not dry_run:
+        for name, path in paths.items():
+            if not Path(path).is_file():
+                raise ValueError(f"Missing data for {name}. Run: python -m arex_v2 download {name}")
+        if not model:
+            raise ValueError("Set AREX_MODEL_NAME or --model-name")
+        if not env.get(api_key_env):
+            raise ValueError(f"Set the model key environment variable {api_key_env!r}")
+        if any(name != "HLE" for name in selected) and not tokenizer_path:
+            raise ValueError("Set AREX_TOKENIZER_PATH or --tokenizer-path to the agent model's tokenizer")
+    for value in extra or []:
+        if "api_key" in value.lower() or "api-key" in value.lower():
+            raise ValueError("Pass keys through --api-key-env/--judge-api-key-env/--summary-api-key-env, not --extra")
+    args = [sys.executable, str(repo_root / "vendor/research/eval_unified.py"),
+            "--datasets", *selected, "--mode", mode,
+            "--start_index", str(start_index),
+            "--end_index", str(start_index + num_tasks if num_tasks is not None else 9999999999999),
+            "--concurrency_limit", str(concurrency)]
+    # Explicit per-dataset ends bypass the legacy HLE default of only 200 tasks.
+    end = start_index + num_tasks if num_tasks is not None else 9999999999999
+    args += ["--dataset-end-indices", " ".join(f"{name}={end}" for name in selected)]
+    if not shuffle:
+        args.append("--no-shuffle")
+    timestamp = datetime.datetime.now().strftime("%Y%m%d-%H%M%S-%f")
+    output = Path(save_path).expanduser().resolve() if save_path else repo_root / "runs" / timestamp
+    args += ["--save_path", str(output)]
+    for flag, value in (("model", model), ("tokenizer_path", tokenizer_path),
+                        ("judge_model", judge_model), ("judge_base_url", judge_base_url),
+                        ("summary_model", summary_model), ("summary_base_url", summary_base_url)):
+        if value:
+            args += [f"--{flag}", value]
+    # Keys remain in the subprocess environment, never in the command preview.
+    for variable, source in (("AREX_SDK_API_KEY", api_key_env),
+                             ("AREX_JUDGE_API_KEY", judge_api_key_env),
+                             ("AREX_SUMMARY_API_KEY", summary_api_key_env)):
+        if source:
+            if not dry_run and not env.get(source):
+                raise ValueError(f"Missing key environment variable {source!r}")
+            env[variable] = env.get(source, "")
+    if base_url:
+        env["AREX_SDK_BASE_URL"] = base_url
+    env["AREX_DATA_PATHS"] = json.dumps(paths)
+    env["UNIFY_EVAL_ROOT"] = str(repo_root / "vendor/research")
+    env["PYTHONPATH"] = str(repo_root / "vendor/research") + os.pathsep + env.get("PYTHONPATH", "")
     if dry_run:
         args.append("--dry-run")
     args += list(extra or [])
-    env = os.environ.copy()
-    # Keep secrets out of argv, shell history, and the command preview. The
-    # evaluator reads these private bridge variables as parser defaults.
-    if api_key_env:
-        api_key = env.get(api_key_env, "")
-        if api_key:
-            env["AREX_SDK_API_KEY"] = api_key
-    if base_url:
-        env["AREX_SDK_BASE_URL"] = base_url
-    if model:
-        env["AREX_MODEL_NAME"] = model
-    env["UNIFY_EVAL_ROOT"] = str(repo_root / "vendor" / "research")
-    env["PYTHONPATH"] = str(repo_root / "vendor" / "research") + os.pathsep + env.get("PYTHONPATH", "")
     return args, env
