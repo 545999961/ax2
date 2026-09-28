@@ -20,6 +20,16 @@ from hle_0724_vendor.visit_fallback import (
     fetch_url_with_fallback,
     format_visit_failure,
 )
+from web_provider import (
+    JINA_API_KEY,
+    JINA_API_URL,
+    SERPER_API_KEY,
+    SERPER_API_URL,
+    is_official_jina,
+    is_official_serper,
+    jina_reader_url,
+    serper_url,
+)
 
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -31,7 +41,6 @@ class NeedRetryError(Exception):
 
 MAX_RETRY_ATTEMPTS = 10
 VISIT_PAGE_MAX_TOKENS = int(os.environ.get("VISIT_PAGE_MAX_TOKENS", "95000"))
-BROWSECOMP_VISIT_TOKEN = ""
 
 
 def _is_retryable_request_error(exc: Exception) -> bool:
@@ -131,14 +140,20 @@ async def search_serper(query: str, page_num: int = 1, use_scholar: bool = False
             case_key=pretty_case_key,
             style="cyan",
         )
-        url = "http://api1.rag.ac.cn/serp_search_v1"
-        payload = {
-            "query": query,
-            "page": page_num,
-            # "search_type": "search",
-            "use_cache": True,
-            "token": "",
-        }
+        url = serper_url(use_scholar)
+        if not SERPER_API_KEY:
+            raise RuntimeError("SERPER_API_KEY is not set")
+        if is_official_serper(url):
+            payload = {"q": query, "page": page_num}
+            headers = {"Content-Type": "application/json", "X-API-KEY": SERPER_API_KEY}
+        else:
+            payload = {
+                "query": query,
+                "page": page_num,
+                "use_cache": True,
+                "token": SERPER_API_KEY,
+            }
+            headers = {"Content-Type": "application/json"}
         if use_scholar:
             payload["search_type"] = "scholar"
         else:
@@ -156,7 +171,6 @@ async def search_serper(query: str, page_num: int = 1, use_scholar: bool = False
             payload["gl"] = "us"
             payload["hl"] = "en"
 
-        headers = {"Content-Type": "application/json"}
         response = await client.post(url, json=payload, headers=headers)
 
         if response.status_code == 429 or response.status_code >= 500:
@@ -274,16 +288,22 @@ async def read_url_jina(url: str, client: httpx.AsyncClient, pretty_case_key: Op
     async def _read_once():
         get_pretty_console().tool_event("jina_read", url, case_key=pretty_case_key, style="cyan")
 
-        api_url = "http://api1.rag.ac.cn/visit_pages_v1"
-
+        api_url = JINA_API_URL
+        if is_official_jina(api_url):
+            headers = {"Accept": "text/plain"}
+            if JINA_API_KEY:
+                headers["Authorization"] = f"Bearer {JINA_API_KEY}"
+            response = await client.get(jina_reader_url(api_url, url), headers=headers)
+            response.raise_for_status()
+            text = re.sub(r"\(https?:.*?\)|\[https?:.*?\]", "", response.text)
+            return text.replace("---", "-").replace("===", "=").replace("   ", " ")
+        if not JINA_API_KEY:
+            raise RuntimeError("JINA_API_KEY is not set")
         data = {
             "urls": [url],
-            "token": BROWSECOMP_VISIT_TOKEN,
+            "token": JINA_API_KEY,
         }
-        headers = {
-            "Content-Type": "application/json"
-        }
-
+        headers = {"Content-Type": "application/json"}
         response = await client.post(api_url, json=data, headers=headers)
         if response.status_code == 429 or response.status_code >= 500:
             get_pretty_console().warning(f"Jina error ({response.status_code}), retry...", pretty_case_key)
@@ -508,7 +528,8 @@ async def readpage_jina(
         visit_result = await asyncio.to_thread(
             fetch_url_with_fallback,
             url,
-            BROWSECOMP_VISIT_TOKEN,
+            JINA_API_KEY,
+            api_url=JINA_API_URL,
         )
         get_pretty_console().tool_event(
             "visit_fallback",

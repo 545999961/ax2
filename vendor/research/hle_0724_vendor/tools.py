@@ -22,29 +22,40 @@ import requests
 from openai import AsyncOpenAI
 from prompt import EXTRACTOR_PROMPT
 from visit_fallback import VisitFetchResult, fetch_url_with_fallback
-
-
-HLE_VISIT_TOKEN = ""
+from web_provider import (
+    JINA_API_KEY,
+    JINA_API_URL,
+    SERPER_API_KEY,
+    SERPER_API_URL,
+    is_official_jina,
+    is_official_serper,
+    jina_reader_url,
+)
 
 def read_url_jina(url: str) -> str:
-    """Use rag.ac.cn visit_pages API to read webpage content, returns Markdown text."""
+    """Read a public page with Jina Reader; the key is supplied by the environment."""
     print(f"  [Visit] Reading: {url}")
-
-    api_url = "http://api1.rag.ac.cn/visit_pages_v1"
-    payload = {
-        "urls": [url],
-        "token": HLE_VISIT_TOKEN,
-    }
-    headers = {"Content-Type": "application/json"}
-
     try:
-        response = requests.post(api_url, json=payload, headers=headers, timeout=60)
+        if is_official_jina(JINA_API_URL):
+            headers = {"Accept": "text/plain"}
+            if JINA_API_KEY:
+                headers["Authorization"] = f"Bearer {JINA_API_KEY}"
+            response = requests.get(
+                jina_reader_url(JINA_API_URL, url), headers=headers, timeout=60
+            )
+            response.raise_for_status()
+            return response.text
+        if not JINA_API_KEY:
+            raise RuntimeError("JINA_API_KEY is not set")
+        response = requests.post(
+            JINA_API_URL,
+            json={"urls": [url], "token": JINA_API_KEY},
+            headers={"Content-Type": "application/json"},
+            timeout=60,
+        )
         response.raise_for_status()
         data = response.json()
-        content = data.get("results", {}).get(url, "")
-        if not content:
-            return ""
-        return content
+        return (data.get("results") or {}).get(url, "")
     except Exception as e:
         return f"[visit] Failed to read page: {e}"
 
@@ -52,7 +63,7 @@ def read_url_jina(url: str) -> str:
 def read_url_with_fallback(url: str) -> VisitFetchResult:
     """Use the resilient visit pipeline while preserving ``read_url_jina`` for legacy mode."""
     print(f"  [Visit fallback] Reading: {url}")
-    return fetch_url_with_fallback(url, HLE_VISIT_TOKEN)
+    return fetch_url_with_fallback(url, JINA_API_KEY, api_url=JINA_API_URL)
 
 
 async def _call_summary_llm(client: AsyncOpenAI, model: str, messages: list, max_retries: int = 3) -> str:
@@ -164,15 +175,21 @@ def search_serper(query: str, topk: int = 10) -> List[Dict[str, Any]]:
     """
 
     print(f"🔍 [Serper] Searching: {query}")
-    url = "http://api1.rag.ac.cn/serp_search_v1"
-    payload = {
-        "query": query,
-        "page": 1,
-        "search_type": "search",
-        "use_cache": True,
-        "token": "",
-    }
-    headers = {"Content-Type": "application/json"}
+    url = SERPER_API_URL
+    if not SERPER_API_KEY:
+        return [{"error": "SERPER_API_KEY is not set"}]
+    if is_official_serper(url):
+        payload = {"q": query, "page": 1}
+        headers = {"Content-Type": "application/json", "X-API-KEY": SERPER_API_KEY}
+    else:
+        payload = {
+            "query": query,
+            "page": 1,
+            "search_type": "search",
+            "use_cache": True,
+            "token": SERPER_API_KEY,
+        }
+        headers = {"Content-Type": "application/json"}
 
     try:
         response = requests.post(url, json=payload, headers=headers, timeout=30)

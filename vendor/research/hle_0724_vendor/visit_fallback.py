@@ -18,8 +18,10 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 
+from web_provider import JINA_API_URL, is_official_jina, jina_reader_url
 
-DEFAULT_VISIT_API_URL = "https://api1.rag.ac.cn/visit_pages_v1"
+
+DEFAULT_VISIT_API_URL = JINA_API_URL
 DEFAULT_MAX_DOWNLOAD_BYTES = int(os.environ.get("VISIT_MAX_DOWNLOAD_BYTES", str(50 * 1024 * 1024)))
 DEFAULT_MAX_EXTRACTED_CHARS = int(os.environ.get("VISIT_MAX_EXTRACTED_CHARS", "380000"))
 DEFAULT_MAX_PDF_PAGES = int(os.environ.get("VISIT_MAX_PDF_PAGES", "200"))
@@ -439,15 +441,29 @@ def _jina_fetch(
     api_url: str,
 ) -> VisitFetchResult:
     try:
-        response = requests.post(
-            api_url,
-            json={"urls": [url], "token": token, "cache_type": cache_type},
-            headers={"Content-Type": "application/json"},
-            timeout=(15, 90),
-        )
-        response.raise_for_status()
-        data = response.json()
-        content = (data.get("results") or {}).get(url, "")
+        if is_official_jina(api_url):
+            headers = {"Accept": "text/plain"}
+            if token:
+                headers["Authorization"] = f"Bearer {token}"
+            response = requests.get(
+                jina_reader_url(api_url, url), headers=headers, timeout=(15, 90)
+            )
+            response.raise_for_status()
+            content = response.text
+        else:
+            if not token:
+                return _error_result(
+                    "missing_jina_api_key", "JINA_API_KEY is not set", "jina_config", final_url=url
+                )
+            response = requests.post(
+                api_url,
+                json={"urls": [url], "token": token, "cache_type": cache_type},
+                headers={"Content-Type": "application/json"},
+                timeout=(15, 90),
+            )
+            response.raise_for_status()
+            data = response.json()
+            content = (data.get("results") or {}).get(url, "")
         error_type = classify_visit_content(content)
         source = f"jina_{cache_type}"
         if error_type:
