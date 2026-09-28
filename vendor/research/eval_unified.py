@@ -1608,9 +1608,17 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--dry-run", "--dry_run", dest="dry_run", action="store_true")
     parser.add_argument("--prev-result-path", "--prev_result_path", dest="prev_result_path", type=str, default="")
 
-    parser.add_argument("--sdk_base_url", type=str, default="")
-    parser.add_argument("--sdk_api_key", type=str, default="")
-    parser.add_argument("--model", type=str, default="")
+    parser.add_argument(
+        "--sdk_base_url",
+        type=str,
+        default=os.environ.get("AREX_SDK_BASE_URL", os.environ.get("BASE_URL", "")),
+    )
+    parser.add_argument(
+        "--sdk_api_key",
+        type=str,
+        default=os.environ.get("AREX_SDK_API_KEY", os.environ.get("API_KEY", "")),
+    )
+    parser.add_argument("--model", type=str, default=os.environ.get("AREX_MODEL_NAME", ""))
     parser.add_argument("--data_path", type=str, default="")
     parser.add_argument("--save_path", type=str, default="")
     parser.add_argument("--max_tokens", type=int, default=240000)

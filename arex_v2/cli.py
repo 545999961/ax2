@@ -45,7 +45,17 @@ def build_parser() -> argparse.ArgumentParser:
     p = sub.add_parser("research", help="BrowseComp/HLE/GAIA/DeepSearchQA runner")
     p.add_argument("dataset", choices=["BrowseComp", "HLE", "GAIA-2023-validation-text-103", "DeepSearch-QA"])
     p.add_argument("--mode", default="direct", choices=["direct", "refine_summary", "return"])
-    p.add_argument("--model", default="")
+    p.add_argument("--model", "--model-name", dest="model", default="")
+    p.add_argument(
+        "--api-key-env",
+        default="API_KEY",
+        help="environment variable containing the model API key (never printed or passed as a CLI value)",
+    )
+    p.add_argument(
+        "--base-url",
+        default="",
+        help="OpenAI-compatible base URL for the model endpoint",
+    )
     p.add_argument("--data-path", default="")
     p.add_argument("--save-path", default="")
     p.add_argument("--dry-run", action="store_true")
@@ -74,7 +84,18 @@ def main(argv: list[str] | None = None) -> None:
         print("mle: MLE-bench Lite competitions through vendor/mle_lite")
         return
     if ns.command == "research":
-        args, env = research.command(ROOT, ns.dataset, mode=ns.mode, model=ns.model, data_path=ns.data_path, save_path=ns.save_path, dry_run=ns.dry_run, extra=ns.extra)
+        args, env = research.command(
+            ROOT,
+            ns.dataset,
+            mode=ns.mode,
+            model=ns.model,
+            api_key_env=ns.api_key_env,
+            base_url=ns.base_url,
+            data_path=ns.data_path,
+            save_path=ns.save_path,
+            dry_run=ns.dry_run,
+            extra=ns.extra,
+        )
         raise SystemExit(_run(args, env, ns.dry_run))
     if ns.command == "algorithmic":
         args, env = frontier.command(ROOT, ns.problem, ns.solution, backend=ns.backend, judge_url=ns.judge_url, dry_run=ns.dry_run)

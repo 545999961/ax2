@@ -33,6 +33,35 @@ Run `python3 -m arex_v2 list` and `python3 -m arex_v2 doctor` before a real
 run. Run artifacts, datasets, model outputs, and credentials are ignored by
 Git.
 
+### Model endpoint configuration
+
+Every model-backed evaluator needs three pieces of runtime configuration:
+
+- `model_name`: the provider's model identifier;
+- `api_key`: injected through an environment variable;
+- `base_url`: the OpenAI-compatible endpoint URL when using a custom or local
+  endpoint.
+
+The unified research CLI exposes the model and endpoint directly while keeping
+the secret out of argv and shell history:
+
+```bash
+# Set the value in your shell or secret manager; never commit it.
+export MY_MODEL_API_KEY="${MY_MODEL_API_KEY:?set MY_MODEL_API_KEY first}"
+python3 -m arex_v2 research BrowseComp \
+  --model-name provider/model \
+  --api-key-env MY_MODEL_API_KEY \
+  --base-url https://api.example.com/v1 \
+  --data-path /path/browse_comp_test_set.csv
+```
+
+`--model` remains an alias for `--model-name`. If `--base-url` is omitted, the
+underlying provider SDK uses its normal default. Judge and summary endpoints
+are separate roles and can still be supplied with evaluator `--extra` flags;
+they must not reuse a production key unless that is intentional. Algorithmic
+generation and MLE-bench keep their provider-specific environment contracts
+because they support multiple providers and key pools.
+
 ## 凭据与搜索/访问工具
 
 当前仓库不包含任何 API key、token 或私有认证文件；我也清理了提交历史中
