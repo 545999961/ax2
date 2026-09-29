@@ -4,7 +4,7 @@
 
 <p><strong>Research, algorithmic programming, and machine learning evaluation</strong></p>
 
-<a href="README.zh-CN.md">中文文档</a> · <a href="docs/evaluation.md">Evaluation</a> · <a href="docs/configuration.md">Configuration</a> · <a href="https://545999961.github.io/AREX-v2/">Project site</a>
+<a href="README.zh-CN.md">中文文档</a> · <a href="docs/evaluation.md">Evaluation</a> · <a href="docs/configuration.md">Configuration</a> · <a href="https://545999961.github.io/ax2/">Project site</a>
 
 <br />
 

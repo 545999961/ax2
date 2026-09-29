@@ -4,7 +4,7 @@
 
 <p><strong>Research、算法编程和机器学习评测</strong></p>
 
-<a href="README.md">English</a> · <a href="docs/evaluation.zh-CN.md">评测说明</a> · <a href="docs/configuration.zh-CN.md">配置说明</a> · <a href="https://545999961.github.io/AREX-v2/">项目主页</a>
+<a href="README.md">English</a> · <a href="docs/evaluation.zh-CN.md">评测说明</a> · <a href="docs/configuration.zh-CN.md">配置说明</a> · <a href="https://545999961.github.io/ax2/">项目主页</a>
 
 <br />
 

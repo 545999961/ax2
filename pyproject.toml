@@ -10,8 +10,8 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.urls]
-Homepage = "https://545999961.github.io/AREX-v2/"
-Repository = "https://github.com/545999961/AREX-v2"
+Homepage = "https://545999961.github.io/ax2/"
+Repository = "https://github.com/545999961/ax2"
 
 [project.optional-dependencies]
 research = ["openai", "httpx", "requests", "pandas", "pyarrow", "huggingface_hub", "pillow", "pypdf", "rich", "transformers"]
