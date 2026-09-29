@@ -2,7 +2,10 @@
 
 AREX-2 is the evaluation checkout used by `self_evolving_v15`. It puts the research, Frontier-CS algorithmic, and MLE-bench Lite evaluation paths behind one small command line interface. Benchmark files, model outputs, and keys stay outside Git; the repository contains the runners, dataset definitions, and the commands needed to reproduce a run.
 
-[中文说明](README.zh-CN.md) · [dataset-by-dataset protocol](data/README.md) · [experiment notes](scripts/README.md) · [project site](https://545999961.github.io/ax2/)
+- 🌐 [Project site](https://545999961.github.io/ax2/) — Research overview and benchmark results.
+- 📚 [Evaluation guide](data/README.md) — Data preparation, prompts, and scoring for each dataset.
+- 🧪 [Experiment notes](scripts/README.md) — Run configurations and experiment notes.
+- 🇨🇳 [中文说明](README.zh-CN.md) — 中文安装与评测指南。
 
 ## Layout
 
@@ -10,7 +13,7 @@ AREX-2 is the evaluation checkout used by `self_evolving_v15`. It puts the resea
 evaluation/   CLI, evaluation adapters, and the pinned evaluator snapshots
 data/         dataset configs, preparation catalog, and per-dataset notes
 assets/       benchmark PDF/SVG, logo files, and the static project site
-scripts/      download scripts, run configs, algorithmic experiments, and tests
+scripts/      download scripts, run configs, and algorithmic experiments
 evaluate.py   short root-level wrapper for selecting research datasets
 ```
 
@@ -30,6 +33,15 @@ python3 evaluate.py doctor
 ```
 
 ## Research evaluation
+
+Copy [the environment template](scripts/configs/model.env.example) to `.env`,
+fill in your model, tokenizer, judge, and tool credentials, then load it once:
+
+```bash
+cp scripts/configs/model.env.example .env
+# Edit .env before loading it.
+set -a; source .env; set +a
+```
 
 List the registered datasets first:
 
@@ -52,6 +64,29 @@ python3 evaluate.py HLE --start-index 100 --n 20
 # run the same range for two datasets
 python3 evaluate.py BrowseComp HLE --n 5 --save-path runs/smoke
 ```
+
+BrowseComp, GAIA, HLE, and DeepSearch-QA use the `refine-equal` profile when
+selected directly. It defaults to one concurrent case, up to ten outer rounds, a 300-call
+per-round budget with a 1,500-call total cap, confidence-tiered review, and
+the same thinking, sampling, token, and retry settings across the four
+benchmarks. Unified-backend summaries use the inference model; HLE's 0724
+solver also uses it, with context and review calls owned by its adapter. The
+judge remains an explicit external service:
+
+```bash
+export MODEL_API_KEY=...
+export JUDGE_API_KEY=...
+python3 evaluate.py BrowseComp --n 10 \
+  --model YOUR_MODEL --base-url http://model.example/v1 \
+  --tokenizer-path /path/to/tokenizer \
+  --judge-model YOUR_JUDGE --judge-base-url http://judge.example/v1 \
+  --judge-api-key-env JUDGE_API_KEY \
+  --save-path runs/browsecomp-10
+```
+
+See [the shared parameter table](evaluation/docs/configuration.md#shared-research-profile)
+for the exact values. `--profile default` opts out of this profile;
+`--dry-run` shows the expanded command without calling a service.
 
 Prepare the four datasets with a built-in download recipe:
 
@@ -92,14 +127,3 @@ The final number comes from the host grader (`grade.log`), including `valid_subm
 ## Results
 
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
-
-The source chart is [available as a PDF](assets/performance/arex-v2-benchmark-results.pdf). Record the Git commit, model, endpoint, task range, evaluator mode, and data checksum with every reported number.
-
-## Checks
-
-```bash
-PYTHONPATH=evaluation python3 -m unittest discover -s evaluation/tests -v
-python3 -m compileall -q evaluation/arex_v2 evaluation/research_eval/unified_eval scripts
-```
-
-Third-party origins and pinned snapshots are listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [SNAPSHOT.txt](SNAPSHOT.txt).

@@ -80,7 +80,18 @@ def build_parser() -> argparse.ArgumentParser:
         help="evaluate one or more research datasets (dataset selection is the only positional input)",
     )
     p.add_argument("dataset", nargs="+", type=dataset_name, metavar="DATASET")
-    p.add_argument("--mode", default="direct", choices=["direct", "refine_summary", "return"])
+    p.add_argument(
+        "--mode",
+        default=None,
+        choices=["direct", "refine_summary", "return"],
+        help="evaluator mode; profile defaults to the dataset's reference mode",
+    )
+    p.add_argument(
+        "--profile",
+        choices=["auto", "default", "refine-equal"],
+        default="auto",
+        help="named benchmark configuration (auto enables refine-equal for the four headline datasets)",
+    )
     p.add_argument("--model", "--model-name", dest="model", default=os.environ.get("AREX_MODEL_NAME", ""))
     p.add_argument(
         "--api-key-env",
@@ -96,12 +107,21 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--save-path", default="", help="default: runs/<timestamp>")
     p.add_argument("--data-root", default="")
     p.add_argument("--tokenizer-path", default=os.environ.get("AREX_TOKENIZER_PATH", ""))
-    p.add_argument("--concurrency", type=positive, default=4)
+    p.add_argument(
+        "--concurrency",
+        type=positive,
+        default=None,
+        help="maximum concurrent cases (profile default: 1; otherwise 4)",
+    )
     p.add_argument("--shuffle", action="store_true", help="use the legacy benchmark sampling order")
     for role in ("judge", "summary"):
         p.add_argument(f"--{role}-model", default=os.environ.get(f"AREX_{role.upper()}_MODEL", ""))
         p.add_argument(f"--{role}-base-url", default=os.environ.get(f"AREX_{role.upper()}_BASE_URL", ""))
-        p.add_argument(f"--{role}-api-key-env", default=os.environ.get(f"AREX_{role.upper()}_API_KEY_ENV", ""))
+        default_key_env = ""
+        p.add_argument(
+            f"--{role}-api-key-env",
+            default=os.environ.get(f"AREX_{role.upper()}_API_KEY_ENV", default_key_env),
+        )
     p.add_argument(
         "--n",
         "--num-tasks",
@@ -152,7 +172,7 @@ def main(argv: list[str] | None = None) -> None:
     if ns.command in ("research", "eval", "evaluate"):
         try:
             args, env = research.command(
-                ROOT, ns.dataset, mode=ns.mode, model=ns.model,
+                ROOT, ns.dataset, mode=ns.mode, profile=ns.profile, model=ns.model,
                 api_key_env=ns.api_key_env, base_url=ns.base_url,
                 data_path=ns.data_path, save_path=ns.save_path,
                 data_root=ns.data_root, tokenizer_path=ns.tokenizer_path,

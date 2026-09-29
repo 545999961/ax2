@@ -17,15 +17,20 @@ evaluate DATASET [DATASET ...]
   --data-path PATH           override one selected dataset's input
   --data-root PATH           prepared data root (default: ./data/files)
   --save-path PATH           result root (default: runs/<timestamp>)
-  --concurrency N            maximum concurrent cases (default: 4)
+  --concurrency N            maximum concurrent cases (profile default: 1; otherwise 4)
+  --profile auto|default|refine-equal
   --extra FLAG               evaluator-specific flag; repeat it
 ```
 
-For example:
+For example, the headline research datasets use the shared `refine-equal`
+profile automatically:
 
 ```bash
 python3 evaluate.py BrowseComp --start-index 100 --n 20 \
-  --extra=--concurrency_limit=4
+  --model YOUR_MODEL --base-url http://model.example/v1 \
+  --tokenizer-path /path/to/tokenizer \
+  --judge-model YOUR_JUDGE --judge-base-url http://judge.example/v1 \
+  --judge-api-key-env JUDGE_API_KEY
 ```
 
 `--api-key-env` is a variable name, not the secret. The adapter copies that
@@ -44,6 +49,7 @@ that the selected data exists before launching the evaluator.
 | `AREX_MODEL_NAME` | default model | every real research run |
 | `AREX_BASE_URL` | default model endpoint | when using a custom endpoint |
 | `AREX_TOKENIZER_PATH` | local token counting | unified research datasets |
+| `JUDGE_API_KEY` (or `--judge-api-key-env`) | external judge SDK | `refine-equal` profile |
 | `SERPER_API_KEY` | `search`, `google_scholar` | research tools |
 | `JINA_API_KEY` | `visit` | private or rate-limited Jina |
 | `HF_TOKEN` | Hugging Face downloader | HLE and GAIA preparation |
@@ -72,6 +78,40 @@ in `data/research/*/config.json`; inspect them with
 `--data-path` is rejected for a multi-dataset command rather than applying one
 file to every dataset.
 
+## Shared research profile
+
+`auto` selects `refine-equal` for BrowseComp, GAIA-2023-validation-text-103,
+HLE, and DeepSearch-QA. The profile uses one concurrent case, ten outer rounds,
+300 calls per round, a 1,500-call total cap, confidence-tiered review, shared
+thinking/sampling/token/retry settings, and an external judge. Summary requests
+use the inference model in the unified backend. HLE's 0724 solver also uses
+the inference model, while its adapter owns context and review calls. Supply the judge explicitly with
+`--judge-model`, `--judge-base-url`, and `--judge-api-key-env`; use
+`--profile default` to opt out. HLE uses its 0724 adapter for context
+truncation and judge calls while keeping the same shared generation and retry
+values.
+
+| Setting | Default |
+| --- | --- |
+| Concurrent cases / outer rounds | 1 / at most 10 |
+| Model-call budget per round / per case | 300 / 1,500, including confidence review |
+| Confidence thresholds | accept ≥ 95; middle tier ≥ 90 |
+| Thinking / preserve thinking / summary thinking | enabled |
+| Temperature / top-p / top-k / min-p | 1.0 / 0.95 / 20 / 0.0 |
+| Presence / repetition penalty | 1.5 / 1.0 |
+| Context / response / review tokens | 240,000 / 16,384 / 4,096 |
+| Tool-call regeneration / logical-call attempts / request attempts | 20 / 5 / 10 |
+| Whole-case attempts / timeout | 1 / 86,400 seconds |
+| Context refresh trigger / maximum updates | 128,000 tokens / 24 (unified backend) |
+
+BrowseComp, GAIA, and DeepSearch-QA run in `refine_summary` mode. HLE keeps its
+0724 solver, reviews the previous answer before each later round, and counts
+that review against the same budget. Its truncation response limit is also
+16,384; the adapter retains a 262,144-token per-request usage guard. Judge
+protocols and their scoring-specific retries remain dataset-specific. HLE
+intermediate rounds live in `_hle_outer/`; only the final case is copied into
+`HLE/`, so an interrupted run can continue with the same `--save-path`.
+
 ## Advanced options and reruns
 
 The underlying evaluator accepts options such as:
@@ -83,6 +123,7 @@ python3 evaluate.py HLE --n 20 \
 ```
 
 Use `python3 evaluation/research_eval/eval_unified.py --help` for the full list. Set a
-unique `--save-path` for each model, mode, and task range. Existing correct
-cases are skipped by default; pass
-`--extra=--skip-existing-mode=none` to rerun them deliberately.
+unique `--save-path` for each model, mode, and task range. The shared profile
+skips all saved final cases; `--profile default` skips correct cases. To start
+a fresh evaluation, use a new result directory. `--extra` overrides individual
+settings and therefore changes the reported evaluation configuration.

@@ -26,14 +26,6 @@ counted as model failures.
 | DeepSearch-QA | CSV; official Gemini-autorater style scorer |
 | HLE | Text-only HLE JSONL; 0724 HLE judge, with `metrics.full_credit` |
 | GAIA-2023-validation-text-103 | Text-only GAIA JSONL; WebAgent-style text judge |
-| xBench-DeepSearch-2510 | Encrypted CSV; xBench official judge |
-| HLE-NoTool | HLE parquet; HLE judge |
-| WideSearch-en / WideSearch-zh-en-prompt | WideSearch JSONL; official table score |
-| WideSearch-en-sft-eval / WideSearch-zh-sft-eval | SFT split of the same table score |
-| DeepWideSearch | DeepWideSearch JSONL; official table score |
-| MoNaCo | Execution traces; Monaco score |
-| DeepResearch-Bench | Query and criteria files; RACE score |
-| BrowseComp-Zh-official-en-prompt | BrowseComp-ZH judge |
 
 The four datasets with a repository download recipe are prepared with:
 
@@ -44,11 +36,6 @@ python3 evaluate.py download HLE                 # requires HF_TOKEN and access
 python3 evaluate.py download GAIA-2023-validation-text-103  # requires HF_TOKEN
 python3 evaluate.py download --list
 ```
-
-The other datasets remain available through the same evaluator, but their
-source files must be obtained according to their upstream license and placed at
-the configured path. Use `--data-path` for a single dataset or inspect the
-paths with `download --list`.
 
 ## Frontier-CS algorithmic
 
@@ -79,7 +66,10 @@ Use `score`, `valid_submission`, and medal/threshold fields from
 
 ## Reproducibility
 
-Record the Git commit, model, base URL, task range, mode, evaluator extras, and
-data checksum beside each result root. Never record API key values. Upstream
-commits and licenses are listed in `SNAPSHOT.txt` and
+Record the Git commit, model, base URL, task range, and evaluator mode, plus the
+data checksum beside each result root. Research runs write `run_metadata.json`
+under each dataset result root and include the same record in every case JSON.
+The record includes the explicit `git_commit`, `model`, `endpoint`,
+`task_range`, `evaluator_mode`, and `data_checksum` fields. Never record API key
+values. Upstream commits and licenses are listed in `SNAPSHOT.txt` and
 `THIRD_PARTY_NOTICES.md`.

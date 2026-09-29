@@ -12,7 +12,7 @@ def direct_repair_enabled_for_dataset(spec: DatasetSpec, config: dict) -> bool:
         return False
     patterns = [
         part.strip().lower()
-        for part in re.split(r"[,\s]+", str(config.get("direct_repair_datasets") or "WideSearch"))
+        for part in re.split(r"[,\s]+", str(config.get("direct_repair_datasets") or "BrowseComp"))
         if part.strip()
     ]
     dataset_name = spec.name.lower()
