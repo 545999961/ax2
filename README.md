@@ -1,6 +1,6 @@
 # AREX-2 evaluation suite
 
-AREX-2 is the evaluation checkout used by `self_evolving_v15`. It puts the research, Frontier-CS algorithmic, and MLE-bench Lite evaluation paths behind one small command line interface. Benchmark files, model outputs, and keys stay outside Git; the repository contains the runners, dataset definitions, and the commands needed to reproduce a run.
+AREX-2 is a compact evaluation suite for research, Frontier-CS algorithmic, and MLE-bench Lite benchmarks. It provides one command-line entry point for preparing data, launching runs, and recording reproducibility metadata. Users supply benchmark inputs and credentials locally; this repository contains the runners, dataset definitions, and reproducible commands.
 
 - 🌐 [Project site](https://545999961.github.io/ax2/) — Research overview and benchmark results.
 - 📚 [Evaluation guide](data/README.md) — Data preparation, prompts, and scoring for each dataset.

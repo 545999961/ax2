@@ -1,6 +1,6 @@
 # AREX-2 评测套件
 
-AREX-2 是 `self_evolving_v15` 使用的评测仓库，统一放置 research、Frontier-CS 算法题和 MLE-bench Lite 三条评测线。数据集、模型输出和密钥不进 Git，仓库只保留评测器、数据集协议和可复现命令。
+AREX-2 是一个面向 research、Frontier-CS 算法题和 MLE-bench Lite 的评测套件。它提供统一的命令行入口，用于准备数据、启动评测并记录复现信息。数据集和凭据由用户在本地提供，仓库只包含评测器、数据集定义和可复现命令。
 
 - 🌐 [项目主页](https://545999961.github.io/ax2/) — 研究概览和 benchmark 结果。
 - 📚 [评测指南](data/README.md) — 数据准备、prompt 和各数据集评分方式。
