@@ -3,7 +3,7 @@
 在仓库最外层选择数据集，包装器会调用对应的评测器：
 
 ```bash
-python3 -m arex_v2 list
+python3 evaluate.py list
 python3 evaluate.py BrowseComp --n 1 --dry-run
 python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 ```
@@ -35,11 +35,11 @@ python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 仓库为下面四个数据集提供下载流程：
 
 ```bash
-python3 -m arex_v2 download BrowseComp
-python3 -m arex_v2 download DeepSearch-QA
-python3 -m arex_v2 download HLE                 # 需要 HF_TOKEN 和访问权限
-python3 -m arex_v2 download GAIA-2023-validation-text-103  # 需要 HF_TOKEN
-python3 -m arex_v2 download --list
+python3 evaluate.py download BrowseComp
+python3 evaluate.py download DeepSearch-QA
+python3 evaluate.py download HLE                 # 需要 HF_TOKEN 和访问权限
+python3 evaluate.py download GAIA-2023-validation-text-103  # 需要 HF_TOKEN
+python3 evaluate.py download --list
 ```
 
 其他数据集仍然可以从同一个入口评测，但需要按照上游许可准备文件并放到配置的
@@ -51,7 +51,7 @@ python3 -m arex_v2 download --list
 
 ```bash
 python3 scripts/download_data.py --dataset algorithmic
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
 ```
 
 checker 会返回 `scoreRatio`、`scoreRatioUnbounded` 等 case 分数。请保留完整
@@ -62,8 +62,8 @@ checker 和 Docker 日志；只有所有必要 case 都通过才算通过。
 准备并运行一场比赛，然后用 host grader 评分：
 
 ```bash
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification --prepare
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification
 MLE_BENCH=$HOME/mle-bench \
   bash evaluation/mle_lite/scripts/grade.sh runs/<run-dir> leaf-classification
 ```

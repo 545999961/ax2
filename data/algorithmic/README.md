@@ -36,8 +36,8 @@ ignored by Git and are mounted into the judge container.
 ## Run
 
 ```bash
-python3 -m arex_v2 download algorithmic
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+python3 evaluate.py download algorithmic
+python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
 ```
 
 The same command can use a running remote judge with `--judge-url`, or launch

@@ -6,7 +6,7 @@
 
 **Reported metric**: task-level correctness. The raw judge payload is kept in the run directory; aggregate only successful rows.
 
-**Data**: The default path is `${AREX_DATA_ROOT}/GAIA-2023-validation-text-103/standardized_data.jsonl` after `${AREX_DATA_ROOT}` expansion. Run `python3 -m arex_v2 download GAIA-2023-validation-text-103`.
+**Data**: The default path is `${AREX_DATA_ROOT}/GAIA-2023-validation-text-103/standardized_data.jsonl` after `${AREX_DATA_ROOT}` expansion. Run `python3 evaluate.py download GAIA-2023-validation-text-103`.
 
 **Run**:
 

@@ -61,7 +61,7 @@ def doctor(_: argparse.Namespace) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="arex", description="Unified AREX v2 evaluation CLI")
+    parser = argparse.ArgumentParser(prog="evaluate.py", description="Unified AREX-2 evaluation CLI")
     sub = parser.add_subparsers(dest="command", required=True)
     sub.add_parser("doctor", help="check the assembled repository")
     sub.add_parser("list", help="list available backends")

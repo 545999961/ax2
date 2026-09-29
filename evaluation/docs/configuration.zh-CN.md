@@ -63,7 +63,7 @@ python3 evaluate.py BrowseComp --start-index 100 --n 20 \
 
 不传 `--data-root` 时，`data/files/legacy/` 下匹配的旧文件仍会被接受。其他评测器
 数据集使用 `data/research/*/config.json` 里的路径，可以用
-`python3 -m arex_v2 download --list` 查看。
+`python3 evaluate.py download --list` 查看。
 
 多数据集运行传入 `--data-path` 会直接报错，避免把一个文件应用到所有数据集。
 

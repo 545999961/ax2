@@ -4,7 +4,7 @@ Select a dataset at the repository boundary and let the wrapper choose its
 bundled evaluator:
 
 ```bash
-python3 -m arex_v2 list
+python3 evaluate.py list
 python3 evaluate.py BrowseComp --n 1 --dry-run
 python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 ```
@@ -38,11 +38,11 @@ counted as model failures.
 The four datasets with a repository download recipe are prepared with:
 
 ```bash
-python3 -m arex_v2 download BrowseComp
-python3 -m arex_v2 download DeepSearch-QA
-python3 -m arex_v2 download HLE                 # requires HF_TOKEN and access
-python3 -m arex_v2 download GAIA-2023-validation-text-103  # requires HF_TOKEN
-python3 -m arex_v2 download --list
+python3 evaluate.py download BrowseComp
+python3 evaluate.py download DeepSearch-QA
+python3 evaluate.py download HLE                 # requires HF_TOKEN and access
+python3 evaluate.py download GAIA-2023-validation-text-103  # requires HF_TOKEN
+python3 evaluate.py download --list
 ```
 
 The other datasets remain available through the same evaluator, but their
@@ -56,7 +56,7 @@ Download the public problem archive and evaluate a C++17 solution:
 
 ```bash
 python3 scripts/download_data.py --dataset algorithmic
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
 ```
 
 The checker reports case scores such as `scoreRatio` and
@@ -68,8 +68,8 @@ result. A solution passes only when all required cases pass.
 Prepare and run one competition, then use the host grader:
 
 ```bash
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification --prepare
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification
 MLE_BENCH=$HOME/mle-bench \
   bash evaluation/mle_lite/scripts/grade.sh runs/<run-dir> leaf-classification
 ```

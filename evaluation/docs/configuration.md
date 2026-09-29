@@ -67,7 +67,7 @@ Downloadable datasets use `data/files/<dataset>/...`:
 When no `--data-root` is supplied, a matching legacy file under
 `data/files/legacy/` is still accepted. Other evaluator datasets use the path
 in `data/research/*/config.json`; inspect them with
-`python3 -m arex_v2 download --list`.
+`python3 evaluate.py download --list`.
 
 `--data-path` is rejected for a multi-dataset command rather than applying one
 file to every dataset.

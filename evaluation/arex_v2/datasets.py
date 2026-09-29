@@ -29,7 +29,7 @@ def canonical_name(value: str) -> str:
             re.sub(r"[^a-z0-9]", "", str(alias).lower()) for alias in aliases
         }:
             return name
-    raise ValueError(f"Unknown dataset {value!r}. Run: python -m arex_v2 list")
+    raise ValueError(f"Unknown dataset {value!r}. Run: python3 evaluate.py list")
 
 
 def data_root(value: str = "") -> Path:

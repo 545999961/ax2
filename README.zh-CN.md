@@ -24,13 +24,13 @@ source .venv/bin/activate
 pip install -e '.[research]'   # research
 # pip install -e '.[frontier]' # Frontier-CS
 # pip install -e '.[all]'      # 全部依赖
-python3 -m arex_v2 doctor
+python3 evaluate.py doctor
 ```
 
 ## Research 评测
 
 ```bash
-python3 -m arex_v2 list
+python3 evaluate.py list
 python3 evaluate.py BrowseComp --n 1 --dry-run
 python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 python3 evaluate.py HLE --start-index 100 --n 20
@@ -41,11 +41,11 @@ python3 evaluate.py HLE --start-index 100 --n 20
 有下载配方的数据集：
 
 ```bash
-python3 -m arex_v2 download BrowseComp
-python3 -m arex_v2 download DeepSearch-QA
-python3 -m arex_v2 download HLE                 # 需要 HF_TOKEN 和访问权限
-python3 -m arex_v2 download GAIA-2023-validation-text-103  # 需要 HF_TOKEN
-python3 -m arex_v2 download --list
+python3 evaluate.py download BrowseComp
+python3 evaluate.py download DeepSearch-QA
+python3 evaluate.py download HLE                 # 需要 HF_TOKEN 和访问权限
+python3 evaluate.py download GAIA-2023-validation-text-103  # 需要 HF_TOKEN
+python3 evaluate.py download --list
 ```
 
 ## Frontier-CS 算法题
@@ -53,8 +53,8 @@ python3 -m arex_v2 download --list
 评测器源码在 `evaluation/algorithmic/`，题目和运行结果在 `data/algorithmic/`：
 
 ```bash
-python3 -m arex_v2 download algorithmic
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+python3 evaluate.py download algorithmic
+python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
 ```
 
 协议和 `scoreRatio` / `scoreRatioUnbounded` 的含义见 [data/algorithmic/README.md](data/algorithmic/README.md)。
@@ -62,8 +62,8 @@ python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
 ## MLE-bench Lite
 
 ```bash
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification --prepare
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification
 MLE_BENCH=$HOME/mle-bench \
   bash evaluation/mle_lite/scripts/grade.sh runs/<run-dir> leaf-classification
 ```

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compatibility entry point for `python -m arex_v2 download`."""
+"""Compatibility entry point for `python3 evaluate.py download`."""
 import sys
 from pathlib import Path
 

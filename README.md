@@ -26,7 +26,7 @@ source .venv/bin/activate
 pip install -e '.[research]'   # research benchmarks
 # pip install -e '.[frontier]' # Frontier-CS
 # pip install -e '.[all]'      # all Python dependencies
-python3 -m arex_v2 doctor
+python3 evaluate.py doctor
 ```
 
 ## Research evaluation
@@ -34,7 +34,7 @@ python3 -m arex_v2 doctor
 List the registered datasets first:
 
 ```bash
-python3 -m arex_v2 list
+python3 evaluate.py list
 ```
 
 The outer interface only asks for a dataset. The wrapper resolves its config, data path, prompt, loader, and scorer before launching the evaluator:
@@ -56,11 +56,11 @@ python3 evaluate.py BrowseComp HLE --n 5 --save-path runs/smoke
 Prepare the four datasets with a built-in download recipe:
 
 ```bash
-python3 -m arex_v2 download BrowseComp
-python3 -m arex_v2 download DeepSearch-QA
-python3 -m arex_v2 download HLE                 # requires HF_TOKEN and access
-python3 -m arex_v2 download GAIA-2023-validation-text-103  # requires HF_TOKEN
-python3 -m arex_v2 download --list
+python3 evaluate.py download BrowseComp
+python3 evaluate.py download DeepSearch-QA
+python3 evaluate.py download HLE                 # requires HF_TOKEN and access
+python3 evaluate.py download GAIA-2023-validation-text-103  # requires HF_TOKEN
+python3 evaluate.py download --list
 ```
 
 By default files are stored under `data/files/`. Use `--data-root PATH` to keep them elsewhere, or `--data-path PATH` for one manually prepared dataset. The selected path is checked before a real run starts. Results are written to `runs/<timestamp>/<dataset>/`; inspect each case's `status`, `judge_raw`, and `score_result` before aggregating scores.
@@ -72,8 +72,8 @@ The per-dataset input format, prompt, judge, metric, and preparation command are
 The source for the judge is in `evaluation/algorithmic/`; the downloaded problem set and run artifacts live in `data/algorithmic/`:
 
 ```bash
-python3 -m arex_v2 download algorithmic
-python3 -m arex_v2 algorithmic 1 path/to/solution.cpp --backend docker
+python3 evaluate.py download algorithmic
+python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
 ```
 
 Solutions are C++17 files. The checker reports per-case results and `scoreRatio`/`scoreRatioUnbounded`; see [data/algorithmic/README.md](data/algorithmic/README.md) for the input layout and judge lifecycle.
@@ -81,8 +81,8 @@ Solutions are C++17 files. The checker reports per-case results and `scoreRatio`
 ## MLE-bench Lite
 
 ```bash
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification --prepare
-MLE_BENCH=$HOME/mle-bench python3 -m arex_v2 mle leaf-classification
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification --prepare
+MLE_BENCH=$HOME/mle-bench python3 evaluate.py mle leaf-classification
 MLE_BENCH=$HOME/mle-bench \
   bash evaluation/mle_lite/scripts/grade.sh runs/<run-dir> leaf-classification
 ```

@@ -6,7 +6,7 @@
 
 **Reported metric**: official QA score. The raw judge payload is kept in the run directory; aggregate only successful rows.
 
-**Data**: The default path is `${AREX_DATA_ROOT}/DeepSearch-QA/DSQA-full.csv` after `${AREX_DATA_ROOT}` expansion. Run `python3 -m arex_v2 download DeepSearch-QA`.
+**Data**: The default path is `${AREX_DATA_ROOT}/DeepSearch-QA/DSQA-full.csv` after `${AREX_DATA_ROOT}` expansion. Run `python3 evaluate.py download DeepSearch-QA`.
 
 **Run**:
 

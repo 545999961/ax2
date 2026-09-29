@@ -1,9 +1,20 @@
 #!/usr/bin/env python3
-"""Run a research evaluation directly from a checkout.
+"""Unified checkout entry point for all AREX-2 evaluation tracks.
 
-This small wrapper keeps the common command discoverable without requiring an
-editable install first.  The first argument is the dataset; all other options
-are the same as ``python -m arex_v2 evaluate``.
+Research datasets can be selected directly::
+
+    python3 evaluate.py BrowseComp --n 10
+
+Other operations use the explicit subcommand form::
+
+    python3 evaluate.py list
+    python3 evaluate.py doctor
+    python3 evaluate.py download BrowseComp
+    python3 evaluate.py algorithmic 1 path/to/solution.cpp --backend docker
+    python3 evaluate.py mle leaf-classification
+
+The implementation lives in ``evaluation/arex_v2``; this file keeps the
+checkout-level command independent of Python package installation details.
 """
 
 from __future__ import annotations
@@ -15,5 +26,28 @@ sys.path.insert(0, str(Path(__file__).resolve().parent / "evaluation"))
 from arex_v2.cli import main
 
 
+_COMMANDS = frozenset({
+    "doctor",
+    "list",
+    "download",
+    "research",
+    "eval",
+    "evaluate",
+    "algorithmic",
+    "mle",
+})
+
+
+def main_from_checkout(argv: list[str] | None = None) -> None:
+    """Dispatch explicit CLI commands or shorthand research dataset names."""
+    args = list(sys.argv[1:] if argv is None else argv)
+    if not args or args[0] in {"-h", "--help"}:
+        main(["--help"])
+    elif args[0] in _COMMANDS:
+        main(args)
+    else:
+        main(["research", *args])
+
+
 if __name__ == "__main__":
-    main(["evaluate", *sys.argv[1:]])
+    main_from_checkout()

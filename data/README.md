@@ -31,19 +31,19 @@ The wrapper resolves the matching directory below, checks the prepared input, an
 
 ## Data locations
 
-The default data root is `data/files/`. Downloadable files are placed in a named subdirectory there. Benchmarks without a publisher recipe use `data/files/external/…`; obtain them under their own license and pass `--data-path` when the location differs. The catalog in [catalog.json](catalog.json) owns the four download recipes and is also used by `arex download --list`.
+The default data root is `data/files/`. Downloadable files are placed in a named subdirectory there. Benchmarks without a publisher recipe use `data/files/external/…`; obtain them under their own license and pass `--data-path` when the location differs. The catalog in [catalog.json](catalog.json) owns the four download recipes and is also used by `python3 evaluate.py download --list`.
 
 ```bash
-python3 -m arex_v2 download --list
-python3 -m arex_v2 download BrowseComp
-python3 -m arex_v2 download DeepSearch-QA
-python3 -m arex_v2 download HLE
-python3 -m arex_v2 download GAIA-2023-validation-text-103
+python3 evaluate.py download --list
+python3 evaluate.py download BrowseComp
+python3 evaluate.py download DeepSearch-QA
+python3 evaluate.py download HLE
+python3 evaluate.py download GAIA-2023-validation-text-103
 ```
 
 ## Other tracks
 
 - [Frontier-CS algorithmic](algorithmic/README.md): C++17 submissions are sent to the checker for every test case. The result is the checker score (`scoreRatio`, with the unbounded value retained).
-- MLE-bench Lite: `python3 -m arex_v2 mle COMPETITION`; the host grader in `evaluation/mle_lite/scripts/grade.sh` supplies the final competition score.
+- MLE-bench Lite: `python3 evaluate.py mle COMPETITION`; the host grader in `evaluation/mle_lite/scripts/grade.sh` supplies the final competition score.
 
 The evaluator implementation is in `evaluation/research_eval/`; it is kept separate from these dataset contracts so changing a runner does not hide how a benchmark is scored.

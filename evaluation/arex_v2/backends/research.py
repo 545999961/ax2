@@ -27,7 +27,7 @@ def command(
     if unknown:
         raise ValueError(
             "Unknown research dataset(s): " + ", ".join(unknown)
-            + ". Run `python -m arex_v2 list` to see available datasets."
+            + ". Run `python3 evaluate.py list` to see available datasets."
         )
     if data_path and len(selected) != 1:
         raise ValueError("--data-path requires exactly one dataset; use --data-root for multiple datasets")
@@ -40,7 +40,7 @@ def command(
         for name in selected:
             path = paths.get(name)
             if not path or not path_is_ready(path):
-                raise ValueError(f"Missing data for {name}. Run: python -m arex_v2 download {name}")
+                raise ValueError(f"Missing data for {name}. Run: python3 evaluate.py download {name}")
         if not model:
             raise ValueError("Set AREX_MODEL_NAME or --model-name")
         if not env.get(api_key_env):

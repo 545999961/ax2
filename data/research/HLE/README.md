@@ -6,7 +6,7 @@
 
 **Reported metric**: full-credit and task metrics. The raw judge payload is kept in the run directory; aggregate only successful rows.
 
-**Data**: The default path is `${AREX_DATA_ROOT}/HLE/text_items.jsonl` after `${AREX_DATA_ROOT}` expansion. Run `python3 -m arex_v2 download HLE`.
+**Data**: The default path is `${AREX_DATA_ROOT}/HLE/text_items.jsonl` after `${AREX_DATA_ROOT}` expansion. Run `python3 evaluate.py download HLE`.
 
 **Run**:
 

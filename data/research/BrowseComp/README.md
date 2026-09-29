@@ -6,7 +6,7 @@
 
 **Reported metric**: official correctness score. The raw judge payload is kept in the run directory; aggregate only successful rows.
 
-**Data**: The default path is `${AREX_DATA_ROOT}/BrowseComp/browse_comp_test_set.csv` after `${AREX_DATA_ROOT}` expansion. Run `python3 -m arex_v2 download BrowseComp`.
+**Data**: The default path is `${AREX_DATA_ROOT}/BrowseComp/browse_comp_test_set.csv` after `${AREX_DATA_ROOT}` expansion. Run `python3 evaluate.py download BrowseComp`.
 
 **Run**:
 
