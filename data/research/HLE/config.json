@@ -28,6 +28,6 @@
   "attachments_root": "${AREX_DATA_ROOT}/HLE",
   "scorer": {
     "type": "hle_official",
-    "source": "${UNIFY_EVAL_ROOT}/hle_0724_vendor/HLE_judge.py (0724 HLE judge)"
+    "source": "HLE judge adapter"
   }
 }

@@ -148,7 +148,7 @@ def command(
             "--skip-existing-mode", "all",
         ]
         if "HLE" in selected:
-            # The HLE 0724 adapter receives the same generation and retry
+            # The HLE adapter receives the same generation and retry
             # values through its own namespaced arguments.  The outer chain is
             # started automatically by eval_unified when no prior run is given.
             hle_outer_root = str(output / "_hle_outer")

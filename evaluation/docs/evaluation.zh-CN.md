@@ -21,7 +21,7 @@ python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 | --- | --- |
 | BrowseComp | 加密 CSV；BrowseComp 官方 judge |
 | DeepSearch-QA | CSV；官方 Gemini-autorater 风格 scorer |
-| HLE | 纯文本 HLE JSONL；0724 HLE judge，另有 `metrics.full_credit` |
+| HLE | 纯文本 HLE JSONL；HLE judge，另有 `metrics.full_credit` |
 | GAIA-2023-validation-text-103 | 纯文本 GAIA JSONL；WebAgent 风格 text judge |
 
 仓库为下面四个数据集提供下载流程：

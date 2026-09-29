@@ -1,4 +1,4 @@
-"""Adapter for the exact HLE agent and judge used by the 0724 evaluation.
+"""Adapter for the exact HLE agent and judge used by the evaluation suite.
 
 The adapter deliberately delegates model-facing behavior to the original
 HLE-Harness modules.  This module only maps unified-eval configuration and
@@ -26,7 +26,7 @@ DEFAULT_HLE_HARNESS_DIR = str(UNIFY_EVAL_ROOT / "hle_0724_vendor")
 DEFAULT_HLE_JUDGE_SCRIPT = str(
     UNIFY_EVAL_ROOT / "hle_0724_vendor" / "HLE_judge.py"
 )
-HLE_0724_SCORER_SOURCE = f"{DEFAULT_HLE_JUDGE_SCRIPT} (0724 HLE judge)"
+HLE_0724_SCORER_SOURCE = f"{DEFAULT_HLE_JUDGE_SCRIPT} (HLE judge adapter)"
 QWEN_USAGE_TOKENIZER_ID = "Qwen/Qwen2.5-7B-Instruct"
 
 
@@ -41,7 +41,7 @@ def select_hle_0724_samples(
     shuffle_samples: bool,
     seed: int = 125,
 ) -> List[EvalSample]:
-    """Match the 0724 ``random.sample(..., NUM_SAMPLES)`` selection order."""
+    """Match the benchmark ``random.sample(..., NUM_SAMPLES)`` selection order."""
     indices = list(range(len(samples)))
     if target_indices is not None:
         selected = [idx for idx in indices if idx in target_indices]
@@ -104,7 +104,7 @@ def _load_module(
     patch_usage_tokenizer: bool = False,
 ):
     if not path.is_file():
-        raise FileNotFoundError(f"HLE 0724 module not found: {path}")
+        raise FileNotFoundError(f"HLE module not found: {path}")
     old_sys_path = list(sys.path)
     saved_tools = sys.modules.pop("tools", None) if import_root else None
     try:
@@ -112,7 +112,7 @@ def _load_module(
             sys.path.insert(0, str(import_root))
         spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:
-            raise ImportError(f"cannot import HLE 0724 module: {path}")
+            raise ImportError(f"cannot import HLE module: {path}")
         module = importlib.util.module_from_spec(spec)
         sys.modules[module_name] = module
         with _tokenizer_import_patch(patch_usage_tokenizer):
@@ -276,7 +276,7 @@ class HLE0724Backend:
             }
         result = await self.agent_module.attempt_question(question, agent_args)
         if result is None:
-            raise RuntimeError("0724 HLE-Harness returned no result")
+            raise RuntimeError("HLE-Harness returned no result")
 
         prediction = {
             "id": result["id"],
@@ -320,7 +320,7 @@ class HLE0724Backend:
                 ),
             )
         if judged_prediction is None:
-            raise RuntimeError("0724 HLE judge returned no result")
+            raise RuntimeError("HLE judge returned no result")
 
         evidence, confidence = _extract_finish_fields(self.agent_module, result)
         judge_response = judged_prediction.get("judge_response") or {}

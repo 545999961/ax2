@@ -24,7 +24,7 @@ counted as model failures.
 | --- | --- |
 | BrowseComp | Encrypted CSV; BrowseComp official judge |
 | DeepSearch-QA | CSV; official Gemini-autorater style scorer |
-| HLE | Text-only HLE JSONL; 0724 HLE judge, with `metrics.full_credit` |
+| HLE | Text-only HLE JSONL; HLE judge, with `metrics.full_credit` |
 | GAIA-2023-validation-text-103 | Text-only GAIA JSONL; WebAgent-style text judge |
 
 The four datasets with a repository download recipe are prepared with:

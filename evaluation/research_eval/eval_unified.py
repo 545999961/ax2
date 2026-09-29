@@ -915,7 +915,7 @@ def hle_0724_score_result(result: dict) -> dict:
     judge_response = result.get("judge_response") or {}
     full_credit = bool(result.get("full_credit"))
     metrics = {
-        "method": "0724_external_hle_judge",
+        "method": "external_hle_judge",
         "full_credit": full_credit,
         "model_answer": judge_response.get("model_answer"),
         "judge_reasoning": judge_response.get("reasoning"),
@@ -1016,7 +1016,7 @@ async def run_one_hle_0724_sample(
         now = datetime.datetime.now()
         case_dir = os.path.join(save_path, f"{now.strftime('%Y-%m-%d_%H-%M-%S')}_row{sample.idx}")
         os.makedirs(case_dir, exist_ok=True)
-        # The 0724 harness attempts each selected question once and has no
+        # The HLE harness attempts each selected question once and has no
         # per-case wall-clock cutoff. Unified-eval only changes persistence.
         max_attempts = 1
         case_timeout_seconds = float(config.get("hle_case_timeout_seconds") or 0)
@@ -1812,7 +1812,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--judge_model", type=str, default="")
     parser.add_argument("--judge-mode", "--judge_mode", dest="judge_mode", type=str, default="local", choices=["local", "offical", "official"])
 
-    hle_group = parser.add_argument_group("0724 HLE-Harness compatibility backend")
+    hle_group = parser.add_argument_group("HLE-Harness compatibility backend")
     hle_group.add_argument('--hle-enable-confidence-review', action='store_true',
                            help='Review low-confidence HLE finishes within the shared model-call budget.')
     hle_group.add_argument('--hle-review-threshold', type=float, default=95)
@@ -1913,7 +1913,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="hle_case_timeout_seconds",
         type=float,
         default=0,
-        help="Optional non-0724 safety override; zero preserves the original no-timeout behavior.",
+        help="Optional safety override; zero preserves the original no-timeout behavior.",
     )
     hle_group.add_argument(
         "--hle-tool-call-regen-max-retries",
@@ -2019,7 +2019,7 @@ def build_parser() -> argparse.ArgumentParser:
         dest="hle_rerun_source_root",
         type=str,
         default="",
-        help="For the HLE 0724 backend, read prior results from this root and rerun only unfinished or low-confidence cases.",
+        help="For the HLE backend, read prior results from this root and rerun only unfinished or low-confidence cases.",
     )
     hle_group.add_argument(
         "--hle-rerun-confidence-threshold",

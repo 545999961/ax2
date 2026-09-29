@@ -77,9 +77,9 @@ python3 evaluate.py BrowseComp --start-index 100 --n 20 \
 `auto` 会为 BrowseComp、GAIA-2023-validation-text-103、HLE 和 DeepSearch-QA
 选择 `refine-equal`：1 并发、10 轮、每轮最多 300 次调用、总计最多 1500 次调用、confidence
 tiered review，以及相同的 thinking/采样/token/retry 设置。unified backend 的 summary 使用推理模型；
-HLE 的 0724 solver 也使用推理模型，但上下文和 review 调用由适配器负责。
+HLE 的专用 solver 也使用推理模型，但上下文和 review 调用由适配器负责。
 judge 必须通过 `--judge-model`、`--judge-base-url` 和 `--judge-api-key-env` 从外部指定；
-使用 `--profile default` 可以关闭这组配置。HLE 仍由 0724 专用 agent/judge 适配器执行，
+使用 `--profile default` 可以关闭这组配置。HLE 仍由专用 agent/judge 适配器执行，
 但沿用同一套生成、预算和重试参数；它的上下文截断和 judge 调用由该适配器负责。
 
 | 参数 | 默认值 |

@@ -42,7 +42,7 @@ class ResearchProfile:
 
 REFINE_EQUAL = ResearchProfile(
     name="refine-equal",
-    mode="direct",  # HLE uses the direct 0724 harness; other targets override this.
+    mode="direct",  # HLE uses its dedicated harness; other targets override this.
     concurrency=1,
     max_outer_rounds=10,
     max_calls_per_outer=300,
@@ -67,7 +67,7 @@ REFINE_EQUAL = ResearchProfile(
 def select_profile(requested: str, datasets: list[str]) -> ResearchProfile | None:
     """Resolve a named profile and validate its dataset scope.
 
-    HLE keeps its 0724 agent loop. Mixed core-dataset runs use refine_summary
+    HLE keeps its dedicated agent loop. Mixed core-dataset runs use refine_summary
     for the unified backend and the independent outer chain for HLE.
     """
 

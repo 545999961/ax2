@@ -17,7 +17,7 @@ The wrapper resolves the matching directory below, checks the prepared input, an
 | [BrowseComp](research/BrowseComp/) | `csv` | CSV encrypted question/answer rows | BrowseComp official judge after canary/decryption checks | `prompt.py, judge_local.py, judge_offical.py` |
 | [DeepSearch-QA](research/DeepSearch-QA/) | `csv` | CSV question/answer rows | DeepSearchQA official Gemini-autorater style judge | `prompt.py, judge_local.py, judge_offical.py` |
 | [GAIA-2023-validation-text-103](research/GAIA-2023-validation-text-103/) | `jsonl` | JSONL text-only GAIA rows | GAIA validation text rubric / WebAgent LLM judge | `prompt.py, judge_local.py, judge_offical.py` |
-| [HLE](research/HLE/) | `jsonl` | JSONL text-only HLE rows (image rows excluded) | 0724 HLE judge in evaluation/research_eval/hle_0724_vendor | `prompt.py, judge_local.py, judge_offical.py` |
+| [HLE](research/HLE/) | `jsonl` | JSONL text-only HLE rows (image rows excluded) | HLE judge adapter | `prompt.py, judge_local.py, judge_offical.py` |
 
 ## Data locations
 

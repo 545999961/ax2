@@ -2,7 +2,7 @@
 
 **Input**: JSONL text-only HLE rows (image rows excluded).
 
-**Evaluation**: The unified evaluator loads `config.json`, applies the prompt in `prompt.py`, runs the model, then uses `hle_official` as the scoring contract. 0724 HLE judge in evaluation/research_eval/hle_0724_vendor.
+**Evaluation**: The unified evaluator loads `config.json`, applies the prompt in `prompt.py`, runs the model, then uses `hle_official` as the scoring contract. HLE judge adapter.
 
 **Reported metric**: full-credit and task metrics. The raw judge payload is kept in the run directory; aggregate only successful rows.
 
@@ -14,7 +14,7 @@
 python3 evaluate.py HLE --n 10 --save-path runs/hle-10
 ```
 
-The default `auto` profile uses the 0724 HLE agent and judge adapter with the
+The default `auto` profile uses the HLE agent and judge adapter with the
 same one-case concurrency, ten outer rounds, 300-per-round and 1,500-total
 budgets, confidence thresholds (95/90), generation settings, and retry values
 as the other three headline benchmarks. HLE-specific context truncation and

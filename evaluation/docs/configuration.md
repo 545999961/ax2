@@ -84,10 +84,10 @@ file to every dataset.
 HLE, and DeepSearch-QA. The profile uses one concurrent case, ten outer rounds,
 300 calls per round, a 1,500-call total cap, confidence-tiered review, shared
 thinking/sampling/token/retry settings, and an external judge. Summary requests
-use the inference model in the unified backend. HLE's 0724 solver also uses
+use the inference model in the unified backend. HLE's dedicated solver also uses
 the inference model, while its adapter owns context and review calls. Supply the judge explicitly with
 `--judge-model`, `--judge-base-url`, and `--judge-api-key-env`; use
-`--profile default` to opt out. HLE uses its 0724 adapter for context
+`--profile default` to opt out. HLE uses its dedicated adapter for context
 truncation and judge calls while keeping the same shared generation and retry
 values.
 
@@ -105,7 +105,7 @@ values.
 | Context refresh trigger / maximum updates | 128,000 tokens / 24 (unified backend) |
 
 BrowseComp, GAIA, and DeepSearch-QA run in `refine_summary` mode. HLE keeps its
-0724 solver, reviews the previous answer before each later round, and counts
+dedicated solver, reviews the previous answer before each later round, and counts
 that review against the same budget. Its truncation response limit is also
 16,384; the adapter retains a 262,144-token per-request usage guard. Judge
 protocols and their scoring-specific retries remain dataset-specific. HLE

@@ -53,7 +53,7 @@ python3 evaluate.py HLE --start-index 100 --n 20
 直接选择 BrowseComp、GAIA、HLE 或 DeepSearch-QA 时，会自动使用
 `refine-equal` profile：1 并发、10 轮、每轮最多 300 次调用、总计最多 1500 次调用，
 并启用 confidence tiered review。四个数据集使用同一套 thinking、采样、token 和 retry
-参数；unified backend 的 summary 使用推理模型，HLE 的 0724 solver 也使用该模型，
+参数；unified backend 的 summary 使用推理模型，HLE 的专用 solver 也使用该模型，
 上下文和 review 调用由适配器负责；judge 由外部指定：
 
 ```bash
