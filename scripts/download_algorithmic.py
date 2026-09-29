@@ -13,7 +13,7 @@ import tarfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
+sys.path.insert(0, str(ROOT / "evaluation"))
 from arex_v2.data import download, extract_tar, extract_zip  # noqa: E402
 
 
@@ -24,7 +24,7 @@ def download_algorithmic(
     url: str = "",
     archive: Path = ROOT / ".cache/frontier-cs-algo.tar.gz",
     sha256: str = "",
-    destination: Path = ROOT / "algorithmic",
+    destination: Path = ROOT / "data" / "algorithmic",
 ) -> Path:
     url = url or f"https://github.com/{repo}/archive/refs/heads/{ref}.tar.gz"
     if not archive.exists():
@@ -52,7 +52,7 @@ def main() -> None:
     parser.add_argument("--url", default="")
     parser.add_argument("--archive", type=Path, default=ROOT / ".cache/frontier-cs-algo.tar.gz")
     parser.add_argument("--sha256", default="")
-    parser.add_argument("--destination", type=Path, default=ROOT / "algorithmic")
+    parser.add_argument("--destination", type=Path, default=ROOT / "data" / "algorithmic")
     ns = parser.parse_args()
     download_algorithmic(
         repo=ns.repo,

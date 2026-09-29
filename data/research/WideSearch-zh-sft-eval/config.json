@@ -1,0 +1,21 @@
+{
+  "name": "WideSearch-zh-sft-eval",
+  "data_path": "${AREX_DATA_ROOT}/external/WideSearch/widesearch.jsonl",
+  "data_format": "jsonl",
+  "task_type": "table",
+  "question_field": "query",
+  "answer_field": "evaluation",
+  "id_field": "instance_id",
+  "metadata_fields": [
+    "evaluation",
+    "language"
+  ],
+  "row_filters": {
+    "language": "zh"
+  },
+  "gold_root": "${AREX_DATA_ROOT}/external/WideSearch/widesearch_gold",
+  "scorer": {
+    "type": "widesearch_official",
+    "source": "WideSearch/src/evaluation official evaluator"
+  }
+}

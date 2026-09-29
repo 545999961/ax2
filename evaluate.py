@@ -9,7 +9,9 @@ are the same as ``python -m arex_v2 evaluate``.
 from __future__ import annotations
 
 import sys
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent / "evaluation"))
 from arex_v2.cli import main
 
 

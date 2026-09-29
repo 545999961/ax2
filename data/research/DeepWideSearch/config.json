@@ -1,0 +1,21 @@
+{
+  "name": "DeepWideSearch",
+  "data_path": "${AREX_DATA_ROOT}/external/DeepWideSearch/overall_20250916.jsonl",
+  "data_format": "jsonl",
+  "task_type": "table",
+  "question_field": "question",
+  "answer_field": "evaluation",
+  "id_field": "instance_id",
+  "metadata_fields": [
+    "evaluation",
+    "raw_deep_question",
+    "topic",
+    "language",
+    "entity"
+  ],
+  "gold_root": "${AREX_DATA_ROOT}/external/DeepWideSearch/overall_20250916_tables",
+  "scorer": {
+    "type": "deepwidesearch_official",
+    "source": "Marco-DeepResearch DeepWideSearch official table evaluator"
+  }
+}

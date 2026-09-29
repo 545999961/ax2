@@ -21,5 +21,9 @@ all = ["openai", "httpx", "requests", "pandas", "pyarrow", "huggingface_hub", "p
 [project.scripts]
 arex = "arex_v2.cli:main"
 
+[tool.setuptools]
+package-dir = {"" = "evaluation"}
+
 [tool.setuptools.packages.find]
+where = ["evaluation"]
 include = ["arex_v2*"]

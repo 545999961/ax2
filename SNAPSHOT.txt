@@ -1,9 +1,9 @@
 AREX evaluation-suite source snapshots assembled 2026-09-28 from the two archives supplied in
 `inference/code/`:
 
-- Frontier-CS-Algo-release.zip -> `vendor/frontier_cs/`, `vendor/harbor_pi_supported/`, `algorithmic/`, and `vendor/frontier_run/`.
-- mle-lite-pi-harness-main.zip -> `vendor/mle_lite/`.
-- Existing research evaluator -> `vendor/research/` (datasets and generated results excluded).
+- Frontier-CS-Algo-release.zip -> `evaluation/frontier_cs/`, `evaluation/harbor_pi_supported/`, `evaluation/algorithmic/`, and `evaluation/frontier_run/`.
+- mle-lite-pi-harness-main.zip -> `evaluation/mle_lite/`.
+- Existing research evaluator -> `evaluation/research_eval/` (datasets and generated results excluded).
 
-`algorithmic/problems/`, research datasets, model outputs, and credentials are
+`data/algorithmic/problems/`, research datasets, model outputs, and credentials are
 runtime inputs and are intentionally not part of this Git tree.
