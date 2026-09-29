@@ -30,12 +30,13 @@
         <a href="#research">Research</a>
         <a href="#data">Training data</a>
         <a href="#results">Results</a>
+        <a href="#citation">Cite</a>
         <a href="#demo">Demo</a>
       </nav>
       <div class="header-actions">
-        <a class="small-button small-button--accent" href="https://huggingface.co/collections/BAAI/arex-2" target="_blank" rel="noopener">Models <span aria-hidden="true">↗</span></a>
+        <a class="small-button small-button--accent" href="https://huggingface.co/BAAI/AREX-2" target="_blank" rel="noopener">Model <span aria-hidden="true">↗</span></a>
         <a class="small-button" href="https://github.com/VectorSpaceLab/AREX-2" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
-        <button class="small-button" type="button" disabled aria-label="Paper link will be added later">Paper <span class="soon">soon</span></button>
+        <a class="small-button" href="https://arxiv.org/abs/2607.21461" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
       </div>
     </div>
   </header>
@@ -46,11 +47,17 @@
       <div class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>AREX-2 <span class="kicker-divider" aria-hidden="true">/</span> Long-horizon reflection</div>
       <div class="hero-grid">
         <div class="hero-copy">
-          <h1 id="hero-title">Advancing <em>Self-Improving Agents</em> <span class="hero-title-tail">through Long-Horizon Reflective Tasks</span></h1>
-          <p class="hero-lede">AREX-2 learns to sustain self-improvement from long-horizon reflective trajectories, with gains that transfer from coding tasks to deep research.</p>
+          <img class="hero-logo" src="media/arex-official.png" width="1360" height="337" alt="AREX-2">
+          <h1 id="hero-title"><span class="hero-title-prefix">AREX-2:</span> Advancing <em>Self-Improving Agents</em> <span class="hero-title-tail">through Long-Horizon Reflective Tasks</span></h1>
+          <p class="hero-lede">AREX-2 treats self-improvement as a test-time capability: an agent uses feedback to revise its solution, then keeps that loop effective over many rounds. We learn this long-horizon reflection from machine learning engineering and algorithmic programming, and observe transfer to deep research.</p>
+          <p class="hero-meta">AREX Team · Beijing Academy of Artificial Intelligence (BAAI)</p>
           <div class="hero-links">
-            <a class="button" href="#research">Explore the research <span aria-hidden="true">↓</span></a>
-            <a class="button button--secondary" href="#results">View results <span aria-hidden="true">↓</span></a>
+            <a class="button" href="https://huggingface.co/BAAI/AREX-2" target="_blank" rel="noopener">Model <span aria-hidden="true">↗</span></a>
+            <a class="button button--secondary" href="https://arxiv.org/abs/2607.21461" target="_blank" rel="noopener">Paper <span aria-hidden="true">↗</span></a>
+          </div>
+          <div class="hero-secondary-links">
+            <a class="text-link" href="#research">Explore the research <span aria-hidden="true">↓</span></a>
+            <a class="text-link" href="#results">View results <span aria-hidden="true">↓</span></a>
           </div>
         </div>
         <figure class="hero-chart" aria-label="An abstract curve of sustained improvement, animated over five seconds">
@@ -204,6 +211,25 @@
       </div>
     </section>
 
+    <section class="section citation-section" id="citation" aria-labelledby="citation-title">
+      <div class="page">
+        <div class="section-index">05 / Citation</div>
+        <div class="section-grid citation-grid">
+          <h2 id="citation-title">Build on the<br><em>reflection loop.</em></h2>
+          <div class="section-copy">
+            <p>If AREX-2 is useful in your work, please cite the paper:</p>
+            <pre class="citation-block"><code>@article{arex2,
+  title   = {AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks},
+  author  = {AREX Team},
+  journal = {arXiv preprint arXiv:2607.21461},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2607.21461}
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <div class="demo-transition">
       <a class="demo-scroll-cue" href="#demo">
         <span>Scroll down to see the demo</span>
@@ -214,7 +240,7 @@
     <section class="section demo-section" id="demo" aria-labelledby="demo-title">
       <div class="demo-view" id="demo-view">
       <div class="demo-heading-wrap">
-        <div class="section-index">05 / Interactive demo</div>
+        <div class="section-index">06 / Interactive demo</div>
         <div class="section-grid demo-heading"><h2 id="demo-title">Follow a solution<br>as it improves.</h2><div class="section-copy"><p>Unloading Boxes · Frontier-CS 164</p><p>Replay five hours of iteration. Explore the task, then inspect the code, edits, and feedback behind each score.</p></div></div>
       </div>
       <div class="demo-embed"><iframe id="run-demo" src="demo/index.html" title="AREX-2 Unloading Boxes: interactive task and recorded run" loading="lazy" allow="clipboard-write" height="760"></iframe></div>
