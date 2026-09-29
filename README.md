@@ -127,8 +127,3 @@ The final number comes from the host grader (`grade.log`), including `valid_subm
 ## Results
 
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
-
-Source chart: [benchmark PDF](assets/performance/arex-v2-benchmark-results.pdf).
-
-Third-party origins and pinned snapshots are listed in
-[THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) and [SNAPSHOT.txt](SNAPSHOT.txt).

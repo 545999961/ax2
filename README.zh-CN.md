@@ -105,5 +105,3 @@ MLE_BENCH=$HOME/mle-bench \
 ## 结果图
 
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
-
-原始图表：[benchmark PDF](assets/performance/arex-v2-benchmark-results.pdf)。
