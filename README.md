@@ -2,7 +2,7 @@
 
 AREX-2 is a compact evaluation suite for research, Frontier-CS algorithmic, and MLE-bench Lite benchmarks. It provides one command-line entry point for preparing data, launching runs, and recording reproducibility metadata. Users supply benchmark inputs and credentials locally; this repository contains the runners, dataset definitions, and reproducible commands.
 
-- 🌐 [Project site](https://545999961.github.io/ax2/) — Research overview and benchmark results.
+<!-- - 🌐 [Project site](https://vectorspacelab.github.io/AREX-2/) — Research overview and benchmark results. -->
 - 📚 [Evaluation guide](data/README.md) — Data preparation, prompts, and scoring for each dataset.
 - 🧪 [Experiment notes](scripts/README.md) — Run configurations and experiment notes.
 - 🇨🇳 [中文说明](README.zh-CN.md) — 中文安装与评测指南。

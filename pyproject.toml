@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = []
 
 [project.urls]
-Homepage = "https://545999961.github.io/ax2/"
+Homepage = "https://vectorspacelab.github.io/AREX-2/"
 Repository = "https://github.com/545999961/ax2"
 
 [project.optional-dependencies]
