@@ -24,6 +24,8 @@ Frontier-CS judge 和 MLE-bench Lite 放在同一个仓库中。大体积、需�
 仓库内置一张覆盖三条评测线的项目效果图，使用 SVG 保存，在 GitHub 页面上
 保持清晰，也方便放进报告。
 
+原始图表见 [PDF](assets/performance/arex-v2-benchmark-results.pdf)。
+
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
 
 只有在 model endpoint、任务范围、工具和 judge 配置一致时，分数才具有可比性。

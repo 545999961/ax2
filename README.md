@@ -25,6 +25,8 @@ Git.
 The checked-in chart is a project snapshot across the three evaluation tracks.
 It is an SVG so it remains readable in GitHub and can be reused in reports.
 
+The source chart is available as [PDF](assets/performance/arex-v2-benchmark-results.pdf).
+
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
 
 The numbers are comparable only when the model endpoint, task range, tools, and

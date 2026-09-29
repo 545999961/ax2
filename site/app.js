@@ -240,51 +240,51 @@
     const configs = {
       mle: {
         title: 'MLE-bench Lite', group: 'coding_and_mle',
-        tagline: 'The highest Medal Average in the manuscript’s comparison set.',
-        protocol: 'Medal Average · higher is better\nOpenMLE protocol · up to 12 hours per task',
-        scope: 'Selected open- and closed-weight systems',
-        note: '‡ Results reproduced and reported by OpenMLE. Selected comparisons; all bars start at zero.',
-        models: ['AREX 2.0', 'GPT-5.6 Sol', 'Kimi-K3', 'Frontis-MA1-35B', 'GPT-5.5', 'Kimi-K2.6', 'Claude Opus 4.8']
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Medal Average · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "GPT-5.6 Sol", "Kimi-K3", "Frontis-MA1", "GPT-5.5", "Kimi-K2.6", "Claude Opus 4.8"]
       },
       fcs: {
         title: 'Frontier-CS', group: 'coding_and_mle',
-        tagline: 'Above every listed open-weight baseline. 5.7 points behind the highest reported score.',
-        protocol: '188-task Agent Track · higher is better\nMaximum execution budget: 5 hours per task',
-        scope: 'Selected open- and closed-weight systems',
-        note: '* Results reproduced by the authors. † Default pi-agent evaluation for those Frontier-CS results. All bars start at zero.',
-        models: ['GPT-5.6 Sol', 'Claude Opus 4.8', 'GPT-5.5', 'AREX 2.0', 'Gemini-3.1-Pro', 'Kimi-K2.7-Code', 'GLM-5.3-Flash']
+        tagline: 'Second only to GPT-5.6 Sol in the supplied comparison set.',
+        protocol: '188-task Agent Track · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["GPT-5.6 Sol", "AREX 2.0", "Gemini-3.1-Pro", "Qwen3.7-Max", "Kimi-K2.7-Code", "GLM-5.3-Flash", "Kimi-K2.6"]
       },
       bc: {
         title: 'BrowseComp', group: 'deep_research',
-        tagline: 'The highest listed score among models with at most 40B parameters.',
-        protocol: 'Accuracy · higher is better\nAREX protocol: 300 inner / 1,500 overall turns',
-        scope: 'Selected models with ≤40B parameters',
-        note: 'Total parameter counts define the size group. The complete table includes larger and frontier models. All bars start at zero.',
-        models: ['AREX 2.0', 'Iris-mini', 'Agents-A1', 'Nex-N2-mini', 'Apodex-1.0-mini', 'AREX-Turbo', 'MiroThinker-1.7-mini']
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set is exactly the one shown in benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "DeepSeek-Pro", "GPT-5.6 Luna", "AREX 1.0 (122B)", "Iris-mini", "XYZ-Aquila-mini", "BigBang-v1"]
       },
       hle: {
         title: 'HLE', group: 'deep_research',
-        tagline: 'The highest listed text-only score among models with at most 40B parameters.',
-        protocol: 'Text-only accuracy · higher is better\nAREX protocol: 300 inner / 1,500 overall turns',
-        scope: 'Selected ≤40B models · text-only HLE',
-        note: 'Text-only subset throughout this chart. Full-set HLE scores appear separately marked in the complete table and are not directly comparable.',
-        models: ['AREX 2.0', 'Iris-mini', 'Agents-A1', 'Qwen3.5-35B', 'Apodex-1.0-mini', 'AREX-Turbo', 'Quest-35B']
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Text-only accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "AREX 1.0 (122B)", "Iris-mini", "GPT-5.5", "BigBang-v1", "DeepSeek-Pro", "DeepSeek-Flash"]
       },
       gaia: {
         title: 'GAIA', group: 'deep_research',
-        tagline: '92.2 accuracy. Below Agents-A1, above every other listed small model with a reported result.',
-        protocol: 'Accuracy · higher is better\nAREX protocol: 300 inner / 1,500 overall turns',
-        scope: 'Selected models with ≤40B parameters',
-        note: 'Agents-A1 reports 96.0 on GAIA. AREX 2.0 is not the highest-scoring small model on this benchmark. All bars start at zero.',
-        models: ['Agents-A1', 'AREX 2.0', 'Nex-N2-mini', 'AREX-Turbo', 'Quest-35B', 'MiroThinker-1.7-mini', 'Qwen3.5-35B']
+        tagline: 'Agents-A1 scores 96.0; AREX 2.0 follows at 92.2.',
+        protocol: 'Accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'Agents-A1 leads the supplied GAIA comparison set at 96.0. All bars start at zero.',
+        models: ["Agents-A1", "AREX 2.0", "GPT-5.5", "AREX 1.0 (122B)", "AREX 1.0 (4B)", "Quest-35B", "Kimi-K2.6"]
       },
       dsqa: {
         title: 'DeepSearchQA', group: 'deep_research',
-        tagline: 'The highest listed F1 among models with at most 40B parameters.',
-        protocol: 'F1 · higher is better\nAREX protocol: 300 inner / 1,500 overall turns',
-        scope: 'Selected models with ≤40B parameters',
-        note: 'DeepSearchQA reports F1, not accuracy. The complete table also includes larger and frontier models. All bars start at zero.',
-        models: ['AREX 2.0', 'Nex-N2-mini', 'Iris-mini', 'Apodex-1.0-mini', 'AREX-Turbo', 'Qwen3.5-35B', 'MiroThinker-1.7-mini']
+        tagline: 'Claude Fable 5 leads at 94.2; AREX 2.0 follows at 93.8.',
+        protocol: 'F1 · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'DeepSearchQA is shown with the score reported in benchmark.pdf. All bars start at zero.',
+        models: ["Claude Fable 5", "AREX 2.0", "Iris-pro", "Kimi-K2.6", "DeepSeek-Flash", "AREX 1.0 (122B)", "DeepSeek-Pro"]
       }
     };
     let selected = 'mle';
