@@ -1,6 +1,16 @@
-# AREX-2 evaluation suite
+<div align="center">
+  <img src="assets/arex-official.png" alt="AREX-2" width="430">
+  <h1>AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</h1>
+  <p><strong>AREX Team · Beijing Academy of Artificial Intelligence (BAAI)</strong></p>
+  <p>
+    <a href="https://huggingface.co/BAAI/AREX-2"><img src="https://img.shields.io/badge/Model-Hugging%20Face-FFD21E?logo=huggingface&logoColor=111827" alt="Model on Hugging Face"></a>
+    <a href="https://arxiv.org/abs/2607.21461"><img src="https://img.shields.io/badge/Paper-arXiv-B31B1B?logo=arxiv&logoColor=white" alt="Paper on arXiv"></a>
+  </p>
+</div>
 
-AREX-2 is a compact evaluation suite for research, Frontier-CS algorithmic, and MLE-bench Lite benchmarks. It provides one command-line entry point for preparing data, launching runs, and recording reproducibility metadata. Users supply benchmark inputs and credentials locally; this repository contains the runners, dataset definitions, and reproducible commands.
+AREX-2 studies whether an agent can turn more test-time rounds into a better solution. The paper treats this as two connected abilities: **reflection**, which uses feedback to decide what to change, and **long-horizon execution**, which keeps the improvement loop useful over many rounds. We synthesize these trajectories from machine learning engineering and algorithmic programming, where progress can be checked directly, and study how the resulting capability transfers to deep research.
+
+This repository contains the evaluation runners and dataset definitions for the six reported tracks. It keeps benchmark files, model outputs, credentials, and run artifacts outside Git while making the evaluation command simple: choose a dataset, then record the model, endpoint, task range, evaluator mode, commit, and data checksum with every number.
 
 <!-- - 🌐 [Project site](https://vectorspacelab.github.io/AREX-2/) — Research overview and benchmark results. -->
 - 📚 [Evaluation guide](data/README.md) — Data preparation, prompts, and scoring for each dataset.
@@ -127,3 +137,17 @@ The final number comes from the host grader (`grade.log`), including `valid_subm
 ## Results
 
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+
+## Citation
+
+If AREX-2 is useful in your work, please cite:
+
+```bibtex
+@article{arex2,
+  title   = {AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks},
+  author  = {AREX Team},
+  journal = {arXiv preprint arXiv:2607.21461},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2607.21461}
+}
+```
