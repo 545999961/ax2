@@ -231,6 +231,125 @@
   });
 
   let benchmarkSource;
+  safeInit('benchmark explorer', () => {
+    benchmarkSource = JSON.parse($('#benchmark-source').textContent);
+    const configs = {
+      mle: {
+        title: 'MLE-bench Lite', group: 'coding_and_mle',
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Medal Average · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "GPT-5.6 Sol", "Kimi-K3", "Frontis-MA1", "GPT-5.5", "Kimi-K2.6", "Claude Opus 4.8"]
+      },
+      fcs: {
+        title: 'Frontier-CS', group: 'coding_and_mle',
+        tagline: 'Second only to GPT-5.6 Sol in the supplied comparison set.',
+        protocol: '188-task Agent Track · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["GPT-5.6 Sol", "AREX 2.0", "Gemini-3.1-Pro", "Qwen3.7-Max", "Kimi-K2.7-Code", "GLM-5.3-Flash", "Kimi-K2.6"]
+      },
+      bc: {
+        title: 'BrowseComp', group: 'deep_research',
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set is exactly the one shown in benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "DeepSeek-Pro", "GPT-5.6 Luna", "AREX 1.0 (122B)", "Iris-mini", "XYZ-Aquila-mini", "BigBang-v1"]
+      },
+      hle: {
+        title: 'HLE', group: 'deep_research',
+        tagline: 'The highest score in the supplied benchmark comparison set.',
+        protocol: 'Text-only accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'The comparison set and values are transcribed from benchmark.pdf. All bars start at zero.',
+        models: ["AREX 2.0", "AREX 1.0 (122B)", "Iris-mini", "GPT-5.5", "BigBang-v1", "DeepSeek-Pro", "DeepSeek-Flash"]
+      },
+      gaia: {
+        title: 'GAIA', group: 'deep_research',
+        tagline: 'Agents-A1 scores 96.0; AREX 2.0 follows at 92.2.',
+        protocol: 'Accuracy · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'Agents-A1 leads the supplied GAIA comparison set at 96.0. All bars start at zero.',
+        models: ["Agents-A1", "AREX 2.0", "GPT-5.5", "AREX 1.0 (122B)", "AREX 1.0 (4B)", "Quest-35B", "Kimi-K2.6"]
+      },
+      dsqa: {
+        title: 'DeepSearchQA', group: 'deep_research',
+        tagline: 'Claude Fable 5 leads at 94.2; AREX 2.0 follows at 93.8.',
+        protocol: 'F1 · higher is better\nAs reported in benchmark.pdf',
+        scope: 'All models shown in benchmark.pdf',
+        note: 'DeepSearchQA is shown with the score reported in benchmark.pdf. All bars start at zero.',
+        models: ["Claude Fable 5", "AREX 2.0", "Iris-pro", "Kimi-K2.6", "DeepSeek-Flash", "AREX 1.0 (122B)", "DeepSeek-Pro"]
+      }
+    };
+    let selected = 'mle';
+    const tabs = $$('[data-tab]');
+    const animations = new Set();
+    const select = (key, announce = true, animate = true) => {
+      const config = configs[key]; if (!config) return;
+      selected = key;
+      const rows = config.models.map(name => benchmarkSource[config.group].find(model => model.model === name));
+      if (rows.some(row => !row || typeof row[key] !== 'number')) throw new Error(`Missing data for ${key}`);
+      const our = rows.find(row => row.model === 'AREX 2.0');
+      tabs.forEach(tab => {
+        const active = tab.dataset.tab === key;
+        tab.setAttribute('aria-selected', String(active)); tab.tabIndex = active ? 0 : -1;
+      });
+      $('#benchmark-panel').setAttribute('aria-labelledby', `tab-${key}`);
+      $('#benchmark-score').textContent = our[key].toFixed(1);
+      $('#benchmark-big-label').textContent = config.title;
+      $('#benchmark-tagline').textContent = config.tagline;
+      $('#benchmark-protocol').replaceChildren(...config.protocol.split('\n').flatMap((line, i) => i ? [document.createElement('br'), document.createTextNode(line)] : [document.createTextNode(line)]));
+      $('#chart-scope').textContent = config.scope;
+      $('#chart-note').textContent = config.note;
+      const fragment = document.createDocumentFragment();
+      for (const model of rows) {
+        const row = document.createElement('div'); row.className = `chart-row${model.model === 'AREX 2.0' ? ' ours' : ''}`;
+        const label = document.createElement('span'); label.className = 'chart-model'; label.textContent = model.model;
+        const marker = [model[`${key}_mark`] || '', key === 'fcs' ? (model.model_mark || '') : ''].join('');
+        if (marker) { const sup = document.createElement('sup'); sup.textContent = marker; label.append(sup); }
+        const track = document.createElement('span'); track.className = 'chart-track'; track.setAttribute('aria-hidden', 'true');
+        const bar = document.createElement('span'); bar.className = 'chart-bar'; bar.style.setProperty('--value', `${model[key]}%`); track.append(bar);
+        const score = document.createElement('span'); score.className = 'chart-value'; score.textContent = model[key].toFixed(1);
+        row.append(label, track, score); fragment.append(row);
+      }
+      animations.forEach(a => a.cancel()); animations.clear();
+      $('#chart-rows').replaceChildren(fragment);
+      if (!paused && animate && Element.prototype.animate) $$('.chart-bar').forEach((bar, i) => {
+        const a = bar.animate([{ transform: 'scaleX(.04)' }, { transform: 'scaleX(1)' }], { duration: 660, delay: i * 30, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+        animations.add(a); a.onfinish = () => animations.delete(a);
+      });
+      if (announce) $('#benchmark-announcement').textContent = `${config.title}: AREX 2.0 scores ${our[key].toFixed(1)}. ${config.tagline}`;
+    };
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => { select(tab.dataset.tab); });
+      tab.addEventListener('keydown', e => {
+        let index = i;
+        if (e.key === 'ArrowRight') index = (i + 1) % tabs.length;
+        else if (e.key === 'ArrowLeft') index = (i - 1 + tabs.length) % tabs.length;
+        else if (e.key === 'Home') index = 0;
+        else if (e.key === 'End') index = tabs.length - 1;
+        else return;
+        e.preventDefault(); tabs[index].focus(); select(tabs[index].dataset.tab);
+      });
+    });
+    $$('[data-benchmark]').forEach(link => link.addEventListener('click', () => {
+      select(link.dataset.benchmark);
+      const tab = $(`#tab-${link.dataset.benchmark}`);
+      const strip = $('.benchmark-tabs');
+      // Only scroll the tab strip; do not change the page's native anchor scroll.
+      strip.scrollLeft = Math.max(0, tab.offsetLeft - strip.offsetLeft - 15);
+    }));
+    select('mle', false, false);
+    if ('IntersectionObserver' in window) {
+      const observer = new IntersectionObserver(entries => {
+        if (entries.some(entry => entry.isIntersecting)) { select(selected, false, true); observer.disconnect(); }
+      }, { threshold: .15 });
+      observer.observe($('#benchmark-panel'));
+    }
+  });
+
   safeInit('resources', () => {
     benchmarkSource = JSON.parse($('#benchmark-source').textContent);
     // Optional standalone builds inject the existing PDF as base64. The deployed
