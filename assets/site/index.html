@@ -4,134 +4,220 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#ffffff">
-  <title>AREX-2 — Self-improving agents</title>
-  <meta name="description" content="AREX-2 trains agents to improve within a task by learning long-horizon reflective trajectories from machine learning and algorithmic programming.">
+  <title>AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</title>
+  <meta name="description" content="AREX-2 learns sustained self-improvement from long-horizon reflective trajectories in machine learning engineering and algorithmic programming, with gains that transfer to deep research.">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="AREX-2">
-  <meta property="og:title" content="AREX-2 — Self-improving agents">
-  <meta property="og:description" content="Learning to turn a first attempt into a better solution through reflection and long-horizon execution.">
-  <link rel="icon" href="assets/arex-favicon.ico">
+  <meta property="og:title" content="AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks">
+  <meta property="og:description" content="Learning to improve, round after round. Long-horizon reflection learned in coding tasks carries over to deep research.">
+  <meta property="og:image" content="https://545999961.github.io/ax2/media/arex-preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="AREX geometric logo">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://545999961.github.io/ax2/media/arex-preview.png">
+  <meta name="twitter:image:alt" content="AREX geometric logo">
+  <link rel="icon" type="image/png" sizes="32x32" href="media/arex-favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="media/arex-touch-icon.png">
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <a class="skip-link" href="#research">Skip to research</a>
   <header class="site-header">
     <div class="page header-inner">
-      <a class="brand" href="#top" aria-label="AREX-2 home"><span class="brand-mark" aria-hidden="true">A</span><span>AREX-2</span></a>
+      <a class="brand" href="#top" aria-label="AREX-2 home"><img class="brand-mark" src="media/arex-mark.png" width="36" height="36" alt=""><span>AREX-2</span></a>
       <nav class="site-nav" aria-label="Primary navigation">
         <a href="#research">Research</a>
         <a href="#data">Training data</a>
         <a href="#results">Results</a>
+        <a href="#demo">Demo</a>
       </nav>
       <div class="header-actions">
-        <a class="small-button small-button--accent" href="https://huggingface.co/collections/BAAI/arex-2" target="_blank" rel="noopener">Model path <span aria-hidden="true">↗</span></a>
-        <button class="small-button" type="button" disabled aria-label="GitHub link will be added later">GitHub <span class="soon">soon</span></button>
+        <a class="small-button small-button--accent" href="https://huggingface.co/collections/BAAI/arex-2" target="_blank" rel="noopener">Models <span aria-hidden="true">↗</span></a>
+        <a class="small-button" href="https://github.com/VectorSpaceLab/AREX-2" target="_blank" rel="noopener">GitHub <span aria-hidden="true">↗</span></a>
         <button class="small-button" type="button" disabled aria-label="Paper link will be added later">Paper <span class="soon">soon</span></button>
       </div>
     </div>
   </header>
 
   <main id="top">
-    <section class="hero page" aria-labelledby="hero-title">
-      <div class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>Research release · Qwen3.8-27B backbone</div>
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-pin"><div class="page">
+      <div class="hero-kicker"><span class="status-dot" aria-hidden="true"></span>AREX-2 <span class="kicker-divider" aria-hidden="true">/</span> Long-horizon reflection</div>
       <div class="hero-grid">
-        <div>
-          <h1 id="hero-title">Agents that improve <em>within the task.</em></h1>
-          <p class="hero-lede">AREX-2 learns the work between a first attempt and a better solution: reflect, measure, revise, and keep going when the first idea fails.</p>
+        <div class="hero-copy">
+          <h1 id="hero-title">Advancing <em>Self-Improving Agents</em> <span class="hero-title-tail">through Long-Horizon Reflective Tasks</span></h1>
+          <p class="hero-lede">AREX-2 learns to sustain self-improvement from long-horizon reflective trajectories, with gains that transfer from coding tasks to deep research.</p>
           <div class="hero-links">
-            <a class="button" href="#results">View benchmark results <span aria-hidden="true">↓</span></a>
-            <a class="text-link" href="#research">What is self-improvement? <span aria-hidden="true">↘</span></a>
+            <a class="button" href="#research">Explore the research <span aria-hidden="true">↓</span></a>
+            <a class="button button--secondary" href="#results">View results <span aria-hidden="true">↓</span></a>
           </div>
         </div>
-        <div class="hero-note" aria-label="AREX-2 focus">
-          <div class="note-label">The focus</div>
-          <p>Test-time iteration, made useful.</p>
-          <div class="loop" aria-hidden="true"><span>try</span><i></i><span>measure</span><i></i><span>reflect</span><i></i><span>revise</span></div>
-          <small>More rounds should create more chances to improve.</small>
-        </div>
+        <figure class="hero-chart" aria-label="An abstract curve of sustained improvement, animated over five seconds">
+          <svg class="progress-illustration" viewBox="0 0 480 360" role="img" aria-labelledby="progress-description">
+            <title id="progress-description">Sustained iteration leads to progress over time</title>
+            <defs><linearGradient id="progress-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c7432b" stop-opacity=".15"/><stop offset="100%" stop-color="#c7432b" stop-opacity="0"/></linearGradient><clipPath id="progress-clip"><rect id="progress-reveal" x="30" y="0" width="410" height="320"/></clipPath></defs>
+            <g class="progress-grid" aria-hidden="true"><path d="M32 70H448M32 150H448M32 230H448M32 310H448"/></g>
+            <path class="progress-axis" d="M32 26V318H452" aria-hidden="true"/>
+            <text class="progress-axis-label" x="242" y="346" text-anchor="middle">Long-Horizon</text><text class="progress-axis-label" transform="translate(13 172) rotate(-90)" text-anchor="middle">Score</text>
+            <path class="progress-track" d="M32 310C68 310 66 270 104 270S141 248 163 248S197 232 214 218S235 190 265 190S284 133 319 133S350 114 370 97S405 65 438 34" aria-hidden="true"/>
+            <path class="progress-area" clip-path="url(#progress-clip)" d="M32 310C68 310 66 270 104 270S141 248 163 248S197 232 214 218S235 190 265 190S284 133 319 133S350 114 370 97S405 65 438 34V318H32Z" aria-hidden="true"/>
+            <path id="progress-curve" class="progress-curve" d="M32 310C68 310 66 270 104 270S141 248 163 248S197 232 214 218S235 190 265 190S284 133 319 133S350 114 370 97S405 65 438 34" aria-hidden="true"/>
+            <path id="progress-cursor" class="progress-cursor" d="M438 34V318" aria-hidden="true"/>
+            <circle id="progress-halo" class="progress-halo" cx="438" cy="34" r="12" aria-hidden="true"/>
+            <circle id="progress-dot" class="progress-dot" cx="438" cy="34" r="4.5" aria-hidden="true"/>
+          </svg>
+        </figure>
       </div>
       <div class="proof-strip" aria-label="Headline benchmark results">
-        <div><strong>81.8</strong><span>MLE-bench Lite</span></div>
-        <div><strong>70.7</strong><span>Frontier-CS</span></div>
-        <div><strong>84.0</strong><span>BrowseComp</span></div>
-        <p>Scores transcribed from the supplied benchmark PDF.</p>
+        <div class="domain-coding"><strong>81.8</strong><span>MLE-bench Lite</span></div>
+        <div class="domain-coding"><strong>70.7</strong><span>Frontier-CS</span></div>
+        <div class="domain-research"><strong>84.0</strong><span>BrowseComp</span></div>
+        <p>Long-horizon reflection. <br>From coding to deep research.</p>
+      </div>
+      </div></div>
+    </section>
+
+    <div class="overview-sections">
+    <section class="section research-section" id="research" aria-labelledby="research-title">
+      <div class="page">
+      <div class="section-index">01 / Research question</div>
+      <div class="section-grid">
+        <h2 id="research-title">Learning to improve,<br>round after round.</h2>
+        <div class="section-copy">
+          <p>AREX-2 learns from trajectories of attempts, feedback, and revisions to judge what to change and turn more rounds into better solutions.</p>
+          <p><strong>Reflection</strong> uses feedback to guide better revisions.<br>
+          <strong>Long-horizon execution</strong> retains useful findings and recovers from setbacks across rounds.<br>
+          <strong>Long-horizon reflection</strong> combines these capabilities to sustain improvement within a task.</p>
+        </div>
+      </div>
       </div>
     </section>
 
-    <section class="section page" id="research" aria-labelledby="research-title">
-      <div class="section-index">01 / Research question</div>
-      <div class="section-grid">
-        <h2 id="research-title">Self-improvement is a test-time skill.</h2>
-        <div class="section-copy">
-          <p>We define self-improvement as the ability to iteratively refine a solution during one task. It is a form of test-time scaling: giving the agent more useful rounds should, in expectation, lead to a better result.</p>
-          <p>Two abilities make that possible. <strong>Reflection</strong> makes the next proposal better than the current one. <strong>Long-horizon execution</strong> keeps enough rounds useful to carry the improvement through.</p>
-          <div class="equation" aria-label="Expected result is initial solution times one plus reflection gain to the power of effective rounds"><span>initial solution</span><b>×</b><span>(1 + <i>r</i>)<sup><i>T</i></sup></span></div>
-          <p class="fine-print"><i>r</i> is the expected gain from one revision; <i>T</i> is the number of effective rounds. The expression is a model of the mechanism, not a claim of monotonic scores.</p>
+    <section class="section idea-section" id="idea" aria-labelledby="concept-title">
+      <div class="page">
+        <div class="idea-topline"><span class="section-index">02 / The idea</span><span class="note-label">One task · Many rounds</span></div>
+        <div class="section-grid idea-layout">
+          <div class="idea-copy"><h2 id="concept-title">Agents that improve<br><em>within the task.</em></h2><p><strong>Reflection</strong> guides the next revision.<br><strong>Long-horizon execution</strong> keeps the loop productive.</p></div>
+          <div class="idea-cycle" aria-label="The self-improvement loop">
+            <svg class="idea-loop" viewBox="0 0 440 244" role="img" aria-labelledby="idea-loop-title idea-loop-description">
+              <title id="idea-loop-title">Try, measure, reflect, revise</title>
+              <desc id="idea-loop-description">Four steps form a repeating loop within one task: build a solution, read feedback, find what to change, and update the solution for the next round.</desc>
+              <defs><marker id="idea-arrow" viewBox="0 0 8 8" refX="6" refY="4" markerWidth="6" markerHeight="6" orient="auto"><path d="M1 1 6 4 1 7" fill="none" stroke="#8c95a3" stroke-width="1.3"/></marker></defs>
+              <g class="idea-loop-connectors" marker-end="url(#idea-arrow)"><path d="M166 52H264"/><path d="M352 86V146"/><path d="M274 190H176"/><path d="M88 156V96"/></g>
+              <g class="idea-loop-node"><rect x="10" y="18" width="156" height="68" rx="3"/><text class="idea-loop-step" x="25" y="42">01</text><text class="idea-loop-name" x="49" y="43">Try</text><text class="idea-loop-detail" x="25" y="66">Build a solution</text></g>
+              <g class="idea-loop-node"><rect x="274" y="18" width="156" height="68" rx="3"/><text class="idea-loop-step" x="289" y="42">02</text><text class="idea-loop-name" x="313" y="43">Measure</text><text class="idea-loop-detail" x="289" y="66">Read the feedback</text></g>
+              <g class="idea-loop-node idea-loop-node--accent"><rect x="274" y="156" width="156" height="68" rx="3"/><text class="idea-loop-step" x="289" y="180">03</text><text class="idea-loop-name" x="313" y="181">Reflect</text><text class="idea-loop-detail" x="289" y="204">Find what to change</text></g>
+              <g class="idea-loop-node"><rect x="10" y="156" width="156" height="68" rx="3"/><text class="idea-loop-step" x="25" y="180">04</text><text class="idea-loop-name" x="49" y="181">Revise</text><text class="idea-loop-detail" x="25" y="204">Update the solution</text></g>
+              <text class="idea-loop-center" x="220" y="118" text-anchor="middle">LEARN FROM</text><text class="idea-loop-center" x="220" y="135" text-anchor="middle">EACH ROUND</text>
+            </svg>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="section section--tint" id="data" aria-labelledby="data-title">
       <div class="page">
-        <div class="section-index">02 / Training data</div>
+        <div class="section-index">03 / Training data</div>
         <div class="section-grid section-grid--data">
-          <h2 id="data-title">Teach improvement where progress is measurable.</h2>
-          <div class="section-copy"><p>Long-horizon reflective traces are rare in ordinary training data. We build them in environments with clean feedback, room to improve, and enough material for many attempts.</p></div>
+          <h2 id="data-title">For coding tasks.<br>Cross-domain transfer.</h2>
+          <div class="section-copy"><p>Machine learning engineering and algorithmic programming offer verifiable feedback and room for sustained improvement. We use both to teach long-horizon reflection.</p></div>
         </div>
-        <div class="feature-grid">
-          <article class="feature-card feature-card--lead"><span class="feature-number">A</span><div><h3>Data self-evolution</h3><p>Start from GitHub repositories and online-judge problems. A teacher model turns them into executable tasks, sandboxes, and scoring functions, then samples complete improvement trajectories.</p><p class="feature-detail">Keep the whole run: successes, regressions, reversions, and changes of strategy.</p></div></article>
-          <article class="feature-card"><span class="feature-number">B</span><div><h3>Machine learning</h3><p>Validation scores make each experiment legible. Rich repositories and optimization headroom let an agent move from a baseline to a stronger pipeline.</p><span class="feature-tag">Clean, continuous feedback</span></div></article>
-          <article class="feature-card"><span class="feature-number">C</span><div><h3>Algorithmic programming</h3><p>Tests and judge scores expose correctness and efficiency. Problems, reference solutions, and scoring functions support sustained iteration.</p><span class="feature-tag">Verifiable feedback</span></div></article>
+        <div class="data-method" aria-label="How the training data teaches improvement">
+          <article class="method-block">
+            <div class="method-heading">
+              <svg class="method-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true"><rect x="3" y="5" width="22" height="18" rx="2"/><path d="m8 10 4 4-4 4m7 0h5"/></svg>
+              <h3>Constructing Environments</h3>
+            </div>
+            <p>A teacher model turns GitHub repositories and online-judge problems into executable environments with scoring functions.</p>
+          </article>
+          <article class="method-block">
+            <div class="method-heading">
+              <svg class="method-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M23 11a9 9 0 0 0-16-4L4 10m0-6v6h6M5 17a9 9 0 0 0 16 4l3-3m0 6v-6h-6"/></svg>
+              <h3>Reflective trajectories</h3>
+            </div>
+            <p>A teacher agent uses feedback and operational knowledge to improve solutions over many rounds.</p>
+          </article>
+          <article class="method-block">
+            <div class="method-heading">
+              <svg class="method-icon" viewBox="0 0 28 28" fill="none" aria-hidden="true"><path d="M17 24H5V4h12l5 5v4M17 4v5h5M9 12h8m-8 4h4m3 4 3 3 6-7"/></svg>
+              <h3>Select and train</h3>
+            </div>
+            <p>Select whole trajectories by their final outcome and process quality. Train on the decisions that move the solution forward.</p>
+          </article>
         </div>
       </div>
     </section>
 
+    </div>
+
     <section class="section results" id="results" aria-labelledby="results-title">
       <div class="page">
-        <div class="section-index">03 / Results</div>
+        <div class="section-index">04 / Results</div>
         <div class="section-grid results-heading">
-          <h2 id="results-title">Strong in the training grounds.<br>Useful beyond them.</h2>
-          <div class="section-copy"><p>These six panels reproduce the comparison sets and values in the supplied <a class="inline-link" href="assets/performance/arex-v2-benchmark-results.pdf" target="_blank" rel="noopener">benchmark PDF</a>. Higher is better; missing entries are not shown.</p></div>
+          <h2 id="results-title">Strong in coding.<br>Transfer to deep research.</h2>
+          <div class="section-copy"><p>AREX-2 (27B) improves over both previous AREX models on all four deep-research benchmarks, using the same deep-research training data. The results support transfer of long-horizon reflection beyond its source domains.</p></div>
         </div>
 
+        <ul class="benchmark-legend" aria-label="Benchmark groups">
+          <li class="domain-coding">Coding · Task domain</li>
+          <li class="domain-research">Deep research · Cross-domain transfer</li>
+        </ul>
         <div class="benchmark-grid" aria-label="AREX-2 benchmark results">
-          <article class="benchmark-card benchmark-card--primary" aria-labelledby="mle-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Training ground</span><h3 id="mle-title">MLE-bench Lite</h3></div><strong>81.8</strong></div>
+          <article class="benchmark-card domain-coding" aria-labelledby="mle-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Coding · Task domain</span><h3 id="mle-title">MLE-bench Lite</h3></div><strong>81.8</strong></div>
             <div class="bars" role="list" aria-label="MLE-bench Lite comparison"><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:81.8%"></i><b>81.8</b></div><div class="bar-row" role="listitem"><span>GPT-5.6 Sol</span><i style="--score:72.7%"></i><b>72.7</b></div><div class="bar-row" role="listitem"><span>Kimi-K3</span><i style="--score:72.7%"></i><b>72.7</b></div><div class="bar-row" role="listitem"><span>Frontis-MA1</span><i style="--score:71.2%"></i><b>71.2</b></div><div class="bar-row" role="listitem"><span>GPT-5.5</span><i style="--score:68.2%"></i><b>68.2</b></div><div class="bar-row" role="listitem"><span>Kimi-K2.6</span><i style="--score:66.7%"></i><b>66.7</b></div><div class="bar-row" role="listitem"><span>Claude Opus 4.8</span><i style="--score:63.6%"></i><b>63.6</b></div></div>
-            <p class="benchmark-note">Medal Average · higher is better</p>
+            <p class="benchmark-note">Any Medal · mean over three seeds · with skills</p>
           </article>
 
-          <article class="benchmark-card benchmark-card--primary" aria-labelledby="fcs-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Training ground</span><h3 id="fcs-title">Frontier-CS</h3></div><strong>70.7</strong></div>
+          <article class="benchmark-card domain-coding" aria-labelledby="fcs-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Coding · Task domain</span><h3 id="fcs-title">Frontier-CS</h3></div><strong>70.7</strong></div>
             <div class="bars" role="list" aria-label="Frontier-CS comparison"><div class="bar-row" role="listitem"><span>GPT-5.6 Sol</span><i style="--score:76.4%"></i><b>76.4</b></div><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:70.7%"></i><b>70.7</b></div><div class="bar-row" role="listitem"><span>Gemini-3.1-Pro</span><i style="--score:68.9%"></i><b>68.9</b></div><div class="bar-row" role="listitem"><span>Qwen3.7-Max</span><i style="--score:61.9%"></i><b>61.9</b></div><div class="bar-row" role="listitem"><span>Kimi-K2.7-Code</span><i style="--score:54.7%"></i><b>54.7</b></div><div class="bar-row" role="listitem"><span>GLM-5.3-Flash</span><i style="--score:50.4%"></i><b>50.4</b></div><div class="bar-row" role="listitem"><span>Kimi-K2.6</span><i style="--score:46.9%"></i><b>46.9</b></div></div>
             <p class="benchmark-note">188-task Agent Track · higher is better</p>
           </article>
 
-          <article class="benchmark-card" aria-labelledby="bc-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Deep research</span><h3 id="bc-title">BrowseComp</h3></div><strong>84.0</strong></div>
-            <div class="bars" role="list" aria-label="BrowseComp comparison"><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:84%"></i><b>84.0</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Pro</span><i style="--score:83.4%"></i><b>83.4</b></div><div class="bar-row" role="listitem"><span>GPT-5.6 Luna</span><i style="--score:83.3%"></i><b>83.3</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:82.5%"></i><b>82.5</b></div><div class="bar-row" role="listitem"><span>Iris-mini</span><i style="--score:82.2%"></i><b>82.2</b></div><div class="bar-row" role="listitem"><span>XYZ-Aquila-mini</span><i style="--score:78.8%"></i><b>78.8</b></div><div class="bar-row" role="listitem"><span>BigBang-v1</span><i style="--score:76.5%"></i><b>76.5</b></div></div>
+          <article class="benchmark-card domain-research" aria-labelledby="bc-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Deep research · Transfer</span><h3 id="bc-title">BrowseComp</h3></div><strong>84.0</strong></div>
+            <div class="bars" role="list" aria-label="BrowseComp comparison"><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:84%"></i><b>84.0</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Pro</span><i style="--score:83.4%"></i><b>83.4</b></div><div class="bar-row" role="listitem"><span>GPT-5.6 Luna</span><i style="--score:83.3%"></i><b>83.3</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:82.5%"></i><b>82.5</b></div><div class="bar-row" role="listitem"><span>Iris-mini</span><i style="--score:82.2%"></i><b>82.2</b></div><div class="bar-row" role="listitem"><span>XYZ-Aquila-mini</span><i style="--score:78.8%"></i><b>78.8</b></div><div class="bar-row" role="listitem"><span>BigBang-v1</span><i style="--score:76.5%"></i><b>76.5</b></div></div>
             <p class="benchmark-note">Accuracy · higher is better</p>
           </article>
 
-          <article class="benchmark-card" aria-labelledby="hle-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Deep research</span><h3 id="hle-title">HLE</h3></div><strong>52.6</strong></div>
-            <div class="bars" role="list" aria-label="HLE comparison"><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:52.6%"></i><b>52.6</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:52.4%"></i><b>52.4</b></div><div class="bar-row" role="listitem"><span>Iris-mini</span><i style="--score:52.3%"></i><b>52.3</b></div><div class="bar-row" role="listitem"><span>GPT-5.5</span><i style="--score:52.2%"></i><b>52.2</b></div><div class="bar-row" role="listitem"><span>BigBang-v1</span><i style="--score:50.3%"></i><b>50.3</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Pro</span><i style="--score:48.2%"></i><b>48.2</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Flash</span><i style="--score:45.1%"></i><b>45.1</b></div></div>
-            <p class="benchmark-note">Text-only accuracy · higher is better</p>
+          <article class="benchmark-card domain-research" aria-labelledby="hle-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Deep research · Transfer</span><h3 id="hle-title">HLE</h3></div><strong>52.6</strong></div>
+            <div class="bars" role="list" aria-label="HLE comparison"><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:52.6%"></i><b>52.6</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:52.4%"></i><b>52.4</b></div><div class="bar-row" role="listitem"><span>Iris-mini</span><i style="--score:52.3%"></i><b>52.3</b></div><div class="bar-row" role="listitem"><span>GPT-5.5*</span><i style="--score:52.2%"></i><b>52.2</b></div><div class="bar-row" role="listitem"><span>BigBang-v1</span><i style="--score:50.3%"></i><b>50.3</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Pro</span><i style="--score:48.2%"></i><b>48.2</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Flash</span><i style="--score:45.1%"></i><b>45.1</b></div></div>
+            <p class="benchmark-note">Text-only accuracy · * GPT-5.5 uses the full HLE set</p>
           </article>
 
-          <article class="benchmark-card" aria-labelledby="gaia-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Deep research</span><h3 id="gaia-title">GAIA</h3></div><strong>92.2</strong></div>
-            <div class="bars" role="list" aria-label="GAIA comparison"><div class="bar-row" role="listitem"><span>XYZ-Aquila-mini</span><i style="--score:97.1%"></i><b>97.1</b></div><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:92.2%"></i><b>92.2</b></div><div class="bar-row" role="listitem"><span>GPT-5.5</span><i style="--score:87.4%"></i><b>87.4</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:85.4%"></i><b>85.4</b></div><div class="bar-row" role="listitem"><span>AREX (4B)</span><i style="--score:81.6%"></i><b>81.6</b></div><div class="bar-row" role="listitem"><span>GLM-5.3-Flash</span><i style="--score:78.8%"></i><b>78.8</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Pro</span><i style="--score:71.1%"></i><b>71.1</b></div></div>
+          <article class="benchmark-card domain-research" aria-labelledby="gaia-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Deep research · Transfer</span><h3 id="gaia-title">GAIA</h3></div><strong>92.2</strong></div>
+            <div class="bars" role="list" aria-label="GAIA comparison"><div class="bar-row" role="listitem"><span>XYZ-Aquila-mini</span><i style="--score:97.1%"></i><b>97.1</b></div><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:92.2%"></i><b>92.2</b></div><div class="bar-row" role="listitem"><span>GPT-5.5</span><i style="--score:87.4%"></i><b>87.4</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:85.4%"></i><b>85.4</b></div><div class="bar-row" role="listitem"><span>AREX (4B)</span><i style="--score:81.6%"></i><b>81.6</b></div><div class="bar-row" role="listitem"><span>GLM-5.3-Flash</span><i style="--score:78.8%"></i><b>78.8</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Pro</span><i style="--score:71.1%"></i><b>71.1</b></div></div>
             <p class="benchmark-note">Accuracy · higher is better</p>
           </article>
 
-          <article class="benchmark-card" aria-labelledby="dsqa-title">
-            <div class="benchmark-head"><div><span class="benchmark-type">Deep research</span><h3 id="dsqa-title">DeepSearchQA</h3></div><strong>93.8</strong></div>
-            <div class="bars" role="list" aria-label="DeepSearchQA comparison"><div class="bar-row" role="listitem"><span>Claude Fable 5</span><i style="--score:94.2%"></i><b>94.2</b></div><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:93.8%"></i><b>93.8</b></div><div class="bar-row" role="listitem"><span>Iris-pro</span><i style="--score:92.9%"></i><b>92.9</b></div><div class="bar-row" role="listitem"><span>Kimi-K2.6</span><i style="--score:92.5%"></i><b>92.5</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Flash</span><i style="--score:90.6%"></i><b>90.6</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:89.9%"></i><b>89.9</b></div><div class="bar-row" role="listitem"><span>DeepSeek-Pro</span><i style="--score:88.7%"></i><b>88.7</b></div></div>
+          <article class="benchmark-card domain-research" aria-labelledby="dsqa-title">
+            <div class="benchmark-head"><div><span class="benchmark-type">Deep research · Transfer</span><h3 id="dsqa-title">DeepSearchQA</h3></div><strong>93.8</strong></div>
+            <div class="bars" role="list" aria-label="DeepSearchQA comparison"><div class="bar-row" role="listitem"><span>Claude Fable 5</span><i style="--score:94.2%"></i><b>94.2</b></div><div class="bar-row ours" role="listitem"><span>AREX-2</span><i style="--score:93.8%"></i><b>93.8</b></div><div class="bar-row" role="listitem"><span>Iris-pro</span><i style="--score:92.9%"></i><b>92.9</b></div><div class="bar-row" role="listitem"><span>Kimi-K2.6</span><i style="--score:92.5%"></i><b>92.5</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Flash</span><i style="--score:90.6%"></i><b>90.6</b></div><div class="bar-row" role="listitem"><span>AREX (122B)</span><i style="--score:89.9%"></i><b>89.9</b></div><div class="bar-row" role="listitem"><span>DeepSeek-V4-Pro</span><i style="--score:88.7%"></i><b>88.7</b></div></div>
             <p class="benchmark-note">F1 · higher is better</p>
           </article>
         </div>
-        <div class="results-foot"><span>Source: supplied benchmark.pdf · updated 2026-09-29</span><a class="text-link" href="assets/performance/arex-v2-benchmark-results.pdf" target="_blank" rel="noopener">Open source PDF <span aria-hidden="true">↗</span></a></div>
+        <div class="results-foot"><span>Source: AREX-2 paper · benchmark comparison</span></div>
+      </div>
+    </section>
+
+    <div class="demo-transition">
+      <a class="demo-scroll-cue" href="#demo">
+        <span>Scroll down to see the demo</span>
+        <svg width="24" height="34" viewBox="0 0 24 34" fill="none" aria-hidden="true"><path d="M12 2v28M5 23l7 7 7-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+
+    <section class="section demo-section" id="demo" aria-labelledby="demo-title">
+      <div class="demo-view" id="demo-view">
+      <div class="demo-heading-wrap">
+        <div class="section-index">05 / Interactive demo</div>
+        <div class="section-grid demo-heading"><h2 id="demo-title">Follow a solution<br>as it improves.</h2><div class="section-copy"><p>Unloading Boxes · Frontier-CS 164</p><p>Replay five hours of iteration. Explore the task, then inspect the code, edits, and feedback behind each score.</p></div></div>
+      </div>
+      <div class="demo-embed"><iframe id="run-demo" src="demo/index.html" title="AREX-2 Unloading Boxes: interactive task and recorded run" loading="lazy" allow="clipboard-write" height="760"></iframe></div>
       </div>
     </section>
   </main>
