@@ -16,7 +16,7 @@ from benchmark_leak_filter import (
     leak_filter_enabled,
     strip_leaks,
 )
-from hle_0724_vendor.visit_fallback import (
+from hle_vendor.visit_fallback import (
     fetch_url_with_fallback,
     format_visit_failure,
 )

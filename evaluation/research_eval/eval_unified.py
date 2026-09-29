@@ -21,14 +21,14 @@ from unified_eval.scorers import score_prediction
 from unified_eval.tools import mode_to_context_strategy, tool_names_for_mode
 from unified_eval.types import DatasetSpec, EvalSample
 from direct_repair import maybe_run_direct_repair_retry
-from hle_0724_backend import (
+from hle_backend import (
     DEFAULT_HLE_HARNESS_DIR,
     DEFAULT_HLE_JUDGE_SCRIPT,
-    HLE0724Backend,
-    HLE_0724_SCORER_SOURCE,
-    select_hle_0724_samples,
+    HLEBackend,
+    HLE_SCORER_SOURCE,
+    select_hle_samples,
 )
-from hle_0724_vendor.visit_fallback import visit_fallback_default_enabled
+from hle_vendor.visit_fallback import visit_fallback_default_enabled
 from pretty_console import case_key as pretty_case_key
 from pretty_console import get_pretty_console
 
@@ -155,7 +155,7 @@ def dataset_selection_config(
     start_index = start_overrides.get(dataset_name, args.start_index)
     end_index = end_overrides.get(dataset_name, args.end_index)
     if (
-        evaluation_backend == "hle_0724"
+        evaluation_backend == "hle"
         and dataset_name not in end_overrides
         and args.end_index == DEFAULT_END_INDEX
     ):
@@ -252,7 +252,11 @@ def hle_result_meets_finish_confidence_threshold(
 
 
 def hle_result_model_calls(result: dict) -> int:
-    hle = result.get("hle_0724") if isinstance(result.get("hle_0724"), dict) else {}
+    legacy_key = "hle" + "_0724"
+    current = result.get("hle")
+    hle = current if isinstance(current, dict) else result.get(legacy_key, {})
+    if not isinstance(hle, dict):
+        hle = {}
     raw = hle.get("raw_prediction") if isinstance(hle.get("raw_prediction"), dict) else {}
     summaries = (
         hle.get("model_usage_summary"),
@@ -498,8 +502,8 @@ def select_samples_for_spec(
     shuffle_samples: bool,
     hle_seed: int = 125,
 ) -> List[EvalSample]:
-    if spec.evaluation_backend == "hle_0724":
-        return select_hle_0724_samples(
+    if spec.evaluation_backend == "hle":
+        return select_hle_samples(
             samples,
             start_index,
             end_index,
@@ -873,7 +877,7 @@ async def write_error_case(
         json.dump(temp_origin, f, ensure_ascii=False, indent=2)
 
 
-def hle_0724_call_stats(result: dict) -> dict:
+def hle_call_stats(result: dict) -> dict:
     usage_summary = result.get("model_usage_summary") or {}
     trajectory = result.get("hle_trajectory") or []
     tool_names = [
@@ -911,7 +915,7 @@ def hle_0724_call_stats(result: dict) -> dict:
     }
 
 
-def hle_0724_score_result(result: dict) -> dict:
+def hle_score_result(result: dict) -> dict:
     judge_response = result.get("judge_response") or {}
     full_credit = bool(result.get("full_credit"))
     metrics = {
@@ -927,7 +931,7 @@ def hle_0724_score_result(result: dict) -> dict:
     return {
         "status": "scored" if full_credit else "incorrect",
         "score": float(result.get("score") or 0.0),
-        "official_scorer": HLE_0724_SCORER_SOURCE,
+        "official_scorer": HLE_SCORER_SOURCE,
         "metrics": metrics,
         "judge_raw": judge_response.get("raw_judge_outputs"),
         "error_type": "HLEJudgeError" if judge_response.get("judge_error") else None,
@@ -935,7 +939,7 @@ def hle_0724_score_result(result: dict) -> dict:
     }
 
 
-async def write_hle_0724_error_case(
+async def write_hle_error_case(
     spec: DatasetSpec,
     sample: EvalSample,
     case_dir: str,
@@ -966,19 +970,19 @@ async def write_hle_0724_error_case(
         "score_result": {
             "status": "error",
             "score": None,
-            "official_scorer": HLE_0724_SCORER_SOURCE,
+            "official_scorer": HLE_SCORER_SOURCE,
             "metrics": {},
             "judge_raw": None,
             "error_type": error_type,
             "error_message": message,
         },
-        "official_scorer": HLE_0724_SCORER_SOURCE,
+        "official_scorer": HLE_SCORER_SOURCE,
         "metadata": sample.metadata,
         "trajectory": [],
         "sub_traj": "",
         "timing_summary": {},
         "run_metadata": run_metadata,
-        "evaluation_backend": "hle_0724",
+        "evaluation_backend": "hle",
         "error": {"type": error_type, "message": message, "traceback": error_trace},
     }
     with open(os.path.join(case_dir, "temp.json"), "w", encoding="utf-8") as f:
@@ -994,16 +998,16 @@ async def write_hle_0724_error_case(
             "case_duration_seconds": time.time() - case_start_time,
             "attempt_duration_seconds": time.time() - attempt_start_time,
             "attempt_index": attempt_idx,
-            "evaluation_backend": "hle_0724",
+            "evaluation_backend": "hle",
             "run_metadata": run_metadata,
         }, f, ensure_ascii=False, indent=2)
 
 
-async def run_one_hle_0724_sample(
+async def run_one_hle_sample(
     spec: DatasetSpec,
     sample: EvalSample,
     config: dict,
-    backend: HLE0724Backend,
+    backend: HLEBackend,
     semaphore: asyncio.Semaphore,
     *,
     outer_resume_path: Optional[str] = None,
@@ -1045,9 +1049,9 @@ async def run_one_hle_0724_sample(
                 else:
                     result = await case_coro
 
-                score_result = hle_0724_score_result(result)
+                score_result = hle_score_result(result)
                 full_credit = bool(result.get("full_credit"))
-                call_stats = hle_0724_call_stats(result)
+                call_stats = hle_call_stats(result)
                 temp_json = {
                     "dataset_name": spec.name,
                     "sample_id": sample.sample_id,
@@ -1060,14 +1064,14 @@ async def run_one_hle_0724_sample(
                     "confidence": result.get("confidence", ""),
                     "score": result.get("score", 0.0),
                     "score_result": score_result,
-                    "official_scorer": HLE_0724_SCORER_SOURCE,
+                    "official_scorer": HLE_SCORER_SOURCE,
                     "metadata": sample.metadata,
                     "trajectory": result.get("messages", []),
                     "sub_traj": "",
                     "timing_summary": {},
-                    "evaluation_backend": "hle_0724",
+                    "evaluation_backend": "hle",
                     "run_metadata": config.get("run_metadata"),
-                    "hle_0724": {
+                    "hle": {
                         "outer_round": outer_round,
                         "confidence_review": result.get('confidence_review', {}),
                         "outer_resume": result.get('outer_resume', {}),
@@ -1093,7 +1097,7 @@ async def run_one_hle_0724_sample(
                     "case_duration_seconds": time.time() - case_start_time,
                     "attempt_duration_seconds": time.time() - attempt_start_time,
                     "attempt_index": attempt_idx,
-                    "evaluation_backend": "hle_0724",
+                    "evaluation_backend": "hle",
                     "run_metadata": config.get("run_metadata"),
                     "model_call_usage": result.get("model_call_usage", []),
                     "model_usage_summary": result.get("model_usage_summary", {}),
@@ -1117,7 +1121,7 @@ async def run_one_hle_0724_sample(
                         f"dataset={spec.name} idx={sample.idx} attempt={attempt_idx} score=0",
                     )
             except asyncio.TimeoutError:
-                await write_hle_0724_error_case(
+                await write_hle_error_case(
                     spec,
                     sample,
                     case_dir,
@@ -1136,7 +1140,7 @@ async def run_one_hle_0724_sample(
                         time.time() - case_start_time,
                     )
             except Exception as exc:
-                await write_hle_0724_error_case(
+                await write_hle_error_case(
                     spec,
                     sample,
                     case_dir,
@@ -1171,7 +1175,7 @@ async def run_hle_per_case_outer_chain(
     spec: DatasetSpec,
     sample: EvalSample,
     config: dict,
-    backend: HLE0724Backend,
+    backend: HLEBackend,
     semaphore: asyncio.Semaphore,
 ) -> None:
     prior_paths = config.get("hle_outer_resume_paths") or {}
@@ -1237,7 +1241,7 @@ async def run_hle_per_case_outer_chain(
                 f"[HLE outer] row={sample.idx} starting missing outer1; "
                 f"max_steps={per_outer_max_steps}"
             )
-            prior_path = await run_one_hle_0724_sample(
+            prior_path = await run_one_hle_sample(
                 spec,
                 sample,
                 outer1_config,
@@ -1305,7 +1309,7 @@ async def run_hle_per_case_outer_chain(
                 print(f"[HLE outer] row={sample.idx} reusing saved outer{outer}")
                 prior_path = existing_path
             else:
-                prior_path = await run_one_hle_0724_sample(
+                prior_path = await run_one_hle_sample(
                     spec,
                     sample,
                     outer_config,
@@ -1336,7 +1340,7 @@ def dry_run(specs: Dict[str, DatasetSpec], args) -> None:
                 spec.evaluation_backend,
             )
             hle_rerun_stats = None
-            if args.hle_rerun_source_root and spec.evaluation_backend == "hle_0724":
+            if args.hle_rerun_source_root and spec.evaluation_backend == "hle":
                 source_save_path = dataset_save_path(args.hle_rerun_source_root, spec.name)
                 candidate_samples = select_samples_for_spec(
                     spec,
@@ -1388,24 +1392,24 @@ def dry_run(specs: Dict[str, DatasetSpec], args) -> None:
                 "data_path": spec.data_path,
                 "prompt_source": (
                     f"{args.hle_harness_dir}/prompts_no_subagent.py"
-                    if spec.evaluation_backend == "hle_0724"
+                    if spec.evaluation_backend == "hle"
                     else spec.prompt_source or "src/prompts_no_subagent.py"
                 ),
                 "tools_direct": (
                     spec.tools
-                    if spec.evaluation_backend == "hle_0724"
+                    if spec.evaluation_backend == "hle"
                     else tool_names_for_mode(spec.tools, "direct")
                 ),
                 "tools_refine_summary": (
                     spec.tools
-                    if spec.evaluation_backend == "hle_0724"
+                    if spec.evaluation_backend == "hle"
                     else tool_names_for_mode(spec.tools, "refine_summary")
                 ),
                 "official_scorer": spec.scorer,
                 "leak_filter": spec.leak_filter,
                 "enable_visit_fallback": args.enable_visit_fallback,
                 "hle_rerun": hle_rerun_stats,
-                "hle_0724": {
+                "hle": {
                     "harness_dir": args.hle_harness_dir,
                     "judge_script": args.hle_judge_script,
                     "seed": args.hle_seed,
@@ -1420,7 +1424,7 @@ def dry_run(specs: Dict[str, DatasetSpec], args) -> None:
                     "preserve_thinking": args.hle_preserve_thinking,
                     "per_case_outer_max": args.hle_per_case_outer_max,
                     "per_case_outer_root": args.hle_per_case_outer_root,
-                } if spec.evaluation_backend == "hle_0724" else None,
+                } if spec.evaluation_backend == "hle" else None,
                 "first_sample": {
                     "sample_id": preview.sample_id,
                     "idx": preview.idx,
@@ -1455,7 +1459,7 @@ async def run_all(args) -> None:
     summary_model = args.summary_model or args.model
     repair_judge_model = args.direct_repair_judge_model or judge_model
     has_unified_backend = any(
-        spec.evaluation_backend != "hle_0724" for spec in specs.values()
+        spec.evaluation_backend != "hle" for spec in specs.values()
     )
     tokenizer = None
     sum_tokenizer = None
@@ -1501,7 +1505,7 @@ async def run_all(args) -> None:
 
     semaphore = asyncio.Semaphore(args.concurrency_limit)
     pretty = get_pretty_console()
-    hle_backends: List[HLE0724Backend] = []
+    hle_backends: List[HLEBackend] = []
     async with contextlib.AsyncExitStack() as stack:
         if getattr(args, "concurrency_control_file", ""):
             from live_concurrency import LiveConcurrency
@@ -1541,7 +1545,7 @@ async def run_all(args) -> None:
             )
             hle_outer_resume_paths = {}
             hle_outer_resume_source_root = ""
-            if args.hle_rerun_source_root and spec.evaluation_backend == "hle_0724":
+            if args.hle_rerun_source_root and spec.evaluation_backend == "hle":
                 source_save_path = dataset_save_path(args.hle_rerun_source_root, spec.name)
                 candidate_samples = select_samples_for_spec(
                     spec,
@@ -1646,7 +1650,7 @@ async def run_all(args) -> None:
                 config["hle_outer_resume_paths"] = hle_outer_resume_paths
             if hle_outer_resume_source_root:
                 config["hle_outer_resume_source_root"] = hle_outer_resume_source_root
-            if args.confidence_outer_resume_root and spec.evaluation_backend != "hle_0724":
+            if args.confidence_outer_resume_root and spec.evaluation_backend != "hle":
                 resume_dataset_root = dataset_save_path(
                     args.confidence_outer_resume_root,
                     spec.name,
@@ -1654,7 +1658,7 @@ async def run_all(args) -> None:
                 config["confidence_outer_resume_paths"] = collect_latest_result_paths_by_index(
                     resume_dataset_root
                 )
-            if spec.evaluation_backend == "hle_0724":
+            if spec.evaluation_backend == "hle":
                 if args.hle_per_case_outer_max > 1 and not args.hle_rerun_source_root:
                     # A fresh public run starts outer1 itself. Store unfinished
                     # rounds outside HLE/ so restarting cannot skip an incomplete chain.
@@ -1666,7 +1670,7 @@ async def run_all(args) -> None:
                     config["hle_per_case_fill_missing_outer1"] = True
                     config["hle_outer_round"] = 2
                     config["hle_final_save_path"] = save_path
-                backend = HLE0724Backend(config)
+                backend = HLEBackend(config)
                 hle_backends.append(backend)
                 for sample in selected:
                     if args.hle_per_case_outer_max > 1:
@@ -1678,7 +1682,7 @@ async def run_all(args) -> None:
                             semaphore,
                         ))
                     else:
-                        all_tasks.append(run_one_hle_0724_sample(
+                        all_tasks.append(run_one_hle_sample(
                             spec,
                             sample,
                             config,

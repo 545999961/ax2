@@ -2,7 +2,7 @@
   "name": "HLE",
   "data_path": "${AREX_DATA_ROOT}/HLE/text_items.jsonl",
   "data_format": "jsonl",
-  "evaluation_backend": "hle_0724",
+  "evaluation_backend": "hle",
   "tools": [
     "search",
     "google_scholar",

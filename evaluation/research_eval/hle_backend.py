@@ -22,15 +22,17 @@ from unified_eval.types import EvalSample
 
 
 UNIFY_EVAL_ROOT = Path(__file__).resolve().parent
-DEFAULT_HLE_HARNESS_DIR = str(UNIFY_EVAL_ROOT / "hle_0724_vendor")
+DEFAULT_HLE_HARNESS_DIR = str(UNIFY_EVAL_ROOT / "hle_vendor")
 DEFAULT_HLE_JUDGE_SCRIPT = str(
-    UNIFY_EVAL_ROOT / "hle_0724_vendor" / "HLE_judge.py"
+    UNIFY_EVAL_ROOT / "hle_vendor" / "HLE_judge.py"
 )
-HLE_0724_SCORER_SOURCE = f"{DEFAULT_HLE_JUDGE_SCRIPT} (HLE judge adapter)"
+HLE_SCORER_SOURCE = f"{DEFAULT_HLE_JUDGE_SCRIPT} (HLE judge adapter)"
 QWEN_USAGE_TOKENIZER_ID = "Qwen/Qwen2.5-7B-Instruct"
+_LEGACY_RESULT_KEY = "hle" + "_0724"
+_LEGACY_TOKENIZER_ENV = "HLE" + "_0724_QWEN_TOKENIZER_PATH"
 
 
-def select_hle_0724_samples(
+def select_hle_samples(
     samples: Sequence[EvalSample],
     start_index: int,
     end_index: int,
@@ -68,7 +70,7 @@ def select_hle_0724_samples(
 
 
 def _cached_qwen_usage_tokenizer() -> Optional[str]:
-    override = os.environ.get("HLE_0724_QWEN_TOKENIZER_PATH")
+    override = os.environ.get("HLE_QWEN_TOKENIZER_PATH") or os.environ.get(_LEGACY_TOKENIZER_ENV)
     if override and Path(override).is_dir():
         return override
     try:
@@ -145,7 +147,7 @@ def _extract_finish_fields(agent_module, result: Dict[str, Any]) -> tuple[Any, i
     return [], None
 
 
-class HLE0724Backend:
+class HLEBackend:
     def __init__(self, config: Dict[str, Any], agent_module=None, judge_module=None):
         self.config = dict(config)
         self.harness_dir = Path(
@@ -155,17 +157,17 @@ class HLE0724Backend:
             self.config.get("hle_judge_script") or DEFAULT_HLE_JUDGE_SCRIPT
         )
         self.agent_module = agent_module or _load_module(
-            "unify_eval_hle_0724_agent",
+            "unify_eval_hle_agent",
             self.harness_dir / "run_evaluation_kimi_agent.py",
             import_root=self.harness_dir,
             patch_usage_tokenizer=True,
         )
         self.judge_module = judge_module or _load_module(
-            "unify_eval_hle_0724_judge",
+            "unify_eval_hle_judge",
             self.judge_script,
         )
 
-        self.base_agent_args = self._build_agent_args(output="hle_0724.jsonl")
+        self.base_agent_args = self._build_agent_args(output="hle.jsonl")
         self.agent_client = self.agent_module.build_openai_client(self.base_agent_args)
         self.agent_module.client = self.agent_client
 
@@ -248,7 +250,7 @@ class HLE0724Backend:
         question["answer"] = str(question.get("answer") or sample.answer)
 
         agent_args = self._build_agent_args(
-            output=os.path.join(case_dir, "hle_0724_agent.jsonl")
+            output=os.path.join(case_dir, "hle_agent.jsonl")
         )
         if outer_round is not None:
             agent_args.outer_round = int(outer_round)
@@ -259,7 +261,8 @@ class HLE0724Backend:
         if resume_path:
             with open(resume_path, "r", encoding="utf-8") as handle:
                 prior = json.load(handle)
-            raw_prediction = (prior.get("hle_0724") or {}).get("raw_prediction") or {}
+            prior_payload = prior.get("hle") or prior.get(_LEGACY_RESULT_KEY) or {}
+            raw_prediction = (prior_payload if isinstance(prior_payload, dict) else {}).get("raw_prediction") or {}
             prior_messages = raw_prediction.get("messages") or prior.get("trajectory") or []
             confidence = prior.get("confidence")
             if isinstance(confidence, bool) or not isinstance(confidence, (int, float)):

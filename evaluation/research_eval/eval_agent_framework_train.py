@@ -18,7 +18,7 @@ from transformers import AutoTokenizer
 import datetime
 import httpx
 from openai_retry_client import create_async_openai_with_retry
-from hle_0724_vendor.visit_fallback import visit_fallback_default_enabled
+from hle_vendor.visit_fallback import visit_fallback_default_enabled
 
 def _patch_browsecomp_typos(correct_answer: str, predicted_answer: str):
     # Keep consistent with FoldAgent/envs/local_search.py:judge()
