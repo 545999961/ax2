@@ -2084,9 +2084,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--end_index", type=int, default=DEFAULT_END_INDEX)
     parser.add_argument("--target_indices", type=str, default="")
     parser.add_argument("--no-shuffle", "--no_shuffle", dest="no_shuffle", action="store_true")
-    parser.add_argument("--dataset-start-indices", "--dataset_start_indices", dest="dataset_start_indices", type=str, default="", help="Per-dataset start overrides, e.g. 'WideSearch=0 DeepWideSearch=10'")
-    parser.add_argument("--dataset-end-indices", "--dataset_end_indices", dest="dataset_end_indices", type=str, default="", help="Per-dataset end overrides, e.g. 'WideSearch=20 DeepWideSearch=30'")
-    parser.add_argument("--dataset-shuffle", "--dataset_shuffle", dest="dataset_shuffle", type=str, default="", help="Per-dataset shuffle overrides, e.g. 'WideSearch=0 DeepWideSearch=1'")
+    parser.add_argument("--dataset-start-indices", "--dataset_start_indices", dest="dataset_start_indices", type=str, default="", help="Per-dataset start overrides, e.g. 'BrowseComp=0 GAIA-2023-validation-text-103=10'")
+    parser.add_argument("--dataset-end-indices", "--dataset_end_indices", dest="dataset_end_indices", type=str, default="", help="Per-dataset end overrides, e.g. 'BrowseComp=20 GAIA-2023-validation-text-103=30'")
+    parser.add_argument("--dataset-shuffle", "--dataset_shuffle", dest="dataset_shuffle", type=str, default="", help="Per-dataset shuffle overrides, e.g. 'BrowseComp=0 GAIA-2023-validation-text-103=1'")
     parser.add_argument("--target-shard-rank", type=int, default=0)
     parser.add_argument("--target-shard-count", type=int, default=1)
     parser.add_argument("--concurrency_limit", type=int, default=16)
@@ -2101,7 +2101,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--direct-repair-retry", "--direct_repair_retry", dest="direct_repair_retry", action="store_true",
                         help="Enable one gold-free direct repair retry after the first finish for matching datasets.")
     parser.add_argument("--direct-repair-datasets", "--direct_repair_datasets", dest="direct_repair_datasets", type=str,
-                        default="WideSearch",
+                        default="BrowseComp",
                         help="Comma/space separated case-insensitive substrings for datasets eligible for direct repair retry.")
     parser.add_argument("--direct-repair-audit-max-tokens", "--direct_repair_audit_max_tokens",
                         dest="direct_repair_audit_max_tokens", type=int, default=4096)

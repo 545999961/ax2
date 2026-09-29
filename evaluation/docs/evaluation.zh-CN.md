@@ -23,14 +23,6 @@ python3 evaluate.py BrowseComp --n 10 --save-path runs/browsecomp-10
 | DeepSearch-QA | CSV；官方 Gemini-autorater 风格 scorer |
 | HLE | 纯文本 HLE JSONL；0724 HLE judge，另有 `metrics.full_credit` |
 | GAIA-2023-validation-text-103 | 纯文本 GAIA JSONL；WebAgent 风格 text judge |
-| xBench-DeepSearch-2510 | 加密 CSV；xBench 官方 judge |
-| HLE-NoTool | HLE parquet；HLE judge |
-| WideSearch-en / WideSearch-zh-en-prompt | WideSearch JSONL；官方表格分数 |
-| WideSearch-en-sft-eval / WideSearch-zh-sft-eval | 同一表格评分在 SFT split 上的结果 |
-| DeepWideSearch | DeepWideSearch JSONL；官方表格评分 |
-| MoNaCo | execution traces；Monaco 分数 |
-| DeepResearch-Bench | query 和 criteria 文件；RACE 分数 |
-| BrowseComp-Zh-official-en-prompt | BrowseComp-ZH judge |
 
 仓库为下面四个数据集提供下载流程：
 
@@ -41,9 +33,6 @@ python3 evaluate.py download HLE                 # 需要 HF_TOKEN 和访问权�
 python3 evaluate.py download GAIA-2023-validation-text-103  # 需要 HF_TOKEN
 python3 evaluate.py download --list
 ```
-
-其他数据集仍然可以从同一个入口评测，但需要按照上游许可准备文件并放到配置的
-路径。单数据集运行可以用 `--data-path`，也可以先用 `download --list` 查看路径。
 
 ## Frontier-CS 算法题
 

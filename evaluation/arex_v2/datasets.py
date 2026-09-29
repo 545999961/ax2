@@ -39,10 +39,9 @@ def data_root(value: str = "") -> Path:
 def _bundled_config_path(name: str, root: Path | None = None) -> Path | None:
     """Return the default path from a bundled evaluator config.
 
-    The four downloadable datasets have entries in ``data/catalog.json``.
-    The remaining evaluator datasets are still valid selections, so they need
-    the same path discovery and preflight checks instead of silently falling
-    back to an opaque error inside the vendor evaluator.
+    The downloadable datasets have entries in ``data/catalog.json``. Every
+    selectable research dataset also carries its input path in its bundled
+    evaluator config, so the wrapper can preflight it before starting a run.
     """
     config_path = RESEARCH_CONFIG_ROOT / name / "config.json"
     if not config_path.is_file():
@@ -82,7 +81,7 @@ def path_is_ready(path: str | Path) -> bool:
     try:
         if candidate.is_file():
             return candidate.stat().st_size > 0
-        # MoNaCo and a few vendor datasets are directories of traces or artifacts.
+        # Some vendor datasets are directories of traces or artifacts.
         return candidate.is_dir() and any(candidate.iterdir())
     except OSError:
         return False

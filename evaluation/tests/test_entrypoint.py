@@ -19,12 +19,12 @@ class DatasetSelectionTests(unittest.TestCase):
         self.assertEqual(canonical_name("browsecomp"), "BrowseComp")
         self.assertEqual(canonical_name("  hle "), "HLE")
         self.assertEqual(canonical_name("deepsearchqa"), "DeepSearch-QA")
-        self.assertEqual(canonical_name("xbench_deepsearch_2510"), "xBench-DeepSearch-2510")
+        self.assertEqual(canonical_name("gaia"), "GAIA-2023-validation-text-103")
 
-    def test_vendor_dataset_paths_are_discovered_from_their_config(self) -> None:
-        paths = dataset_paths(ROOT / "data" / "files", ["MoNaCo"])
-        self.assertIn("MoNaCo", paths)
-        self.assertTrue(paths["MoNaCo"].endswith("data/files/MoNaCo/execution_traces"))
+    def test_core_dataset_paths_are_discovered_from_their_config(self) -> None:
+        paths = dataset_paths(ROOT / "data" / "files", ["BrowseComp"])
+        self.assertIn("BrowseComp", paths)
+        self.assertTrue(paths["BrowseComp"].endswith("data/files/BrowseComp/browse_comp_test_set.csv"))
 
     def test_directory_dataset_is_a_valid_input_path(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
@@ -140,8 +140,8 @@ class DatasetSelectionTests(unittest.TestCase):
                 self.assertIn("--enable_confidence_tiered_review", args)
         args, _ = command(ROOT, ["BrowseComp", "HLE"], dry_run=True)
         self.assertIn("--hle-per-case-outer-max", args)
-        with self.assertRaisesRegex(ValueError, "separately"):
-            command(ROOT, ["BrowseComp", "MoNaCo"], dry_run=True)
+        with self.assertRaisesRegex(ValueError, "Unknown research dataset"):
+            command(ROOT, ["BrowseComp", "RemovedDataset"], dry_run=True)
 
     def test_summary_uses_agent_credentials_and_judge_is_explicit(self) -> None:
         with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {
