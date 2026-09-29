@@ -13,7 +13,7 @@ AREX-2 is the evaluation checkout used by `self_evolving_v15`. It puts the resea
 evaluation/   CLI, evaluation adapters, and the pinned evaluator snapshots
 data/         dataset configs, preparation catalog, and per-dataset notes
 assets/       benchmark PDF/SVG, logo files, and the static project site
-scripts/      download scripts, run configs, algorithmic experiments, and tests
+scripts/      download scripts, run configs, and algorithmic experiments
 evaluate.py   short root-level wrapper for selecting research datasets
 ```
 

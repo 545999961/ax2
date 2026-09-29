@@ -1,6 +1,6 @@
 # Experiments and reproducibility
 
-This directory holds commands that prepare data, run auxiliary experiments, and verify the checkout. The evaluator itself stays in `evaluation/`; dataset contracts stay in `data/`.
+This directory holds commands that prepare data and run auxiliary experiments. The evaluator itself stays in `evaluation/`; dataset contracts stay in `data/`.
 
 ```text
 configs/       safe local environment template
@@ -20,9 +20,8 @@ commit, task range, evaluator mode, and data checksum to `run_metadata.json`
 and every case result. API keys belong in the shell environment and never in
 command-line arguments or result files.
 
-Run the repository checks from the root:
+Compile the maintained Python entrypoints from the root:
 
 ```bash
-PYTHONPATH=evaluation python3 -m unittest discover -s evaluation/tests -v
 python3 -m compileall -q evaluation/arex_v2 evaluation/research_eval/unified_eval scripts
 ```

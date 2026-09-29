@@ -13,7 +13,7 @@ AREX-2 是 `self_evolving_v15` 使用的评测仓库，统一放置 research、F
 evaluation/   CLI、评测适配器和固定版本的评测器
 data/         数据集配置、准备清单和逐数据集说明
 assets/       benchmark PDF/SVG、logo 和项目主页
-scripts/      下载脚本、运行配置、算法题实验和测试
+scripts/      下载脚本、运行配置和算法题实验
 evaluate.py   选择 research 数据集的根目录快捷入口
 ```
 
