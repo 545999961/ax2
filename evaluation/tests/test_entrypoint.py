@@ -4,6 +4,7 @@ import os
 import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 ROOT = Path(__file__).resolve().parents[2]
 import sys
@@ -44,7 +45,9 @@ class DatasetSelectionTests(unittest.TestCase):
             dataset_file.parent.mkdir()
             dataset_file.write_text("problem,answer,canary\nquestion,answer,key\n", encoding="utf-8")
             old_key = os.environ.get("MODEL_API_KEY")
+            old_judge_key = os.environ.get("JUDGE_API_KEY")
             os.environ["MODEL_API_KEY"] = "test-only"
+            os.environ["JUDGE_API_KEY"] = "judge-only"
             try:
                 args, env = command(
                     ROOT,
@@ -52,6 +55,9 @@ class DatasetSelectionTests(unittest.TestCase):
                     data_root=str(data_root),
                     model="test-model",
                     tokenizer_path="test-tokenizer",
+                    judge_model="test-judge",
+                    judge_base_url="http://judge.test/v1",
+                    judge_api_key_env="JUDGE_API_KEY",
                     num_tasks=1,
                 )
             finally:
@@ -59,8 +65,102 @@ class DatasetSelectionTests(unittest.TestCase):
                     os.environ.pop("MODEL_API_KEY", None)
                 else:
                     os.environ["MODEL_API_KEY"] = old_key
+                if old_judge_key is None:
+                    os.environ.pop("JUDGE_API_KEY", None)
+                else:
+                    os.environ["JUDGE_API_KEY"] = old_judge_key
             self.assertIn("--datasets", args)
             self.assertIn(str(dataset_file), env["AREX_DATA_PATHS"])
+
+    def test_refine_equal_profile_expands_shared_reference_settings(self) -> None:
+        args, env = command(
+            ROOT,
+            "BrowseComp",
+            model="model",
+            base_url="http://model.test/v1",
+            api_key_env="MODEL_API_KEY",
+            tokenizer_path="tokenizer",
+            judge_model="judge",
+            judge_base_url="http://judge.test/v1",
+            judge_api_key_env="JUDGE_API_KEY",
+            num_tasks=3,
+            dry_run=True,
+        )
+        rendered = " ".join(args)
+        for fragment in (
+            "--mode refine_summary",
+            "--concurrency_limit 1",
+            "--refine_summary_max_outer_rounds 10",
+            "--refine_summary_max_llm_calls 300",
+            "--refine_summary_max_total_llm_calls 1500",
+            "--enable_confidence_tiered_review",
+            "--agent_temperature 1.0",
+            "--max_response_tokens 16384",
+            "--llm_call_max_retries 5",
+            "--summary_model model",
+            "--judge-mode offical",
+        ):
+            self.assertIn(fragment, rendered)
+        self.assertEqual(env["AREX_SUMMARY_API_KEY"], env.get("MODEL_API_KEY", ""))
+
+    def test_hle_profile_uses_same_generation_values_and_outer_budget(self) -> None:
+        args, _ = command(
+            ROOT,
+            "HLE",
+            model="model",
+            base_url="http://model.test/v1",
+            tokenizer_path="",
+            judge_model="judge",
+            judge_base_url="http://judge.test/v1",
+            judge_api_key_env="JUDGE_API_KEY",
+            num_tasks=1,
+            dry_run=True,
+        )
+        rendered = " ".join(args)
+        for fragment in (
+            "--mode direct",
+            "--hle-max-steps 300",
+            "--hle-per-case-outer-max 10",
+            "--hle-per-case-total-max-steps 1500",
+            "--hle-temperature 1.0",
+            "--hle-top-p 0.95",
+            "--hle-top-k 20",
+            "--hle-tool-call-regen-max-retries 20",
+            "--hle-llm-call-max-retries 5",
+            "--hle-general-max-attempts 10",
+        ):
+            self.assertIn(fragment, rendered)
+
+    def test_core_datasets_share_profile_and_allow_explicit_concurrency(self) -> None:
+        for dataset in ("BrowseComp", "GAIA-2023-validation-text-103", "DeepSearch-QA"):
+            with self.subTest(dataset=dataset):
+                args, _ = command(ROOT, dataset, concurrency=2, dry_run=True)
+                self.assertEqual(args[args.index("--concurrency_limit") + 1], "2")
+                self.assertEqual(args.count("--concurrency_limit"), 1)
+                self.assertIn("--enable_confidence_tiered_review", args)
+        args, _ = command(ROOT, ["BrowseComp", "HLE"], dry_run=True)
+        self.assertIn("--hle-per-case-outer-max", args)
+        with self.assertRaisesRegex(ValueError, "separately"):
+            command(ROOT, ["BrowseComp", "MoNaCo"], dry_run=True)
+
+    def test_summary_uses_agent_credentials_and_judge_is_explicit(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp, mock.patch.dict(os.environ, {
+            "MODEL_API_KEY": "agent-only", "JUDGE_API_KEY": "judge-only",
+        }):
+            data = Path(tmp, "input.csv")
+            data.write_text("problem,answer\nq,a\n", encoding="utf-8")
+            options = dict(model="model", base_url="http://agent.test/v1",
+                           tokenizer_path="tokenizer", data_path=str(data))
+            with self.assertRaisesRegex(ValueError, "externally specified judge"):
+                command(ROOT, "BrowseComp", **options)
+            args, env = command(ROOT, "BrowseComp", **options, judge_model="judge",
+                                judge_base_url="http://judge.test/v1", judge_api_key_env="JUDGE_API_KEY")
+            self.assertEqual(env["AREX_SUMMARY_API_KEY"], "agent-only")
+            self.assertEqual(env["AREX_JUDGE_API_KEY"], "judge-only")
+            self.assertNotIn("agent-only", " ".join(args))
+            self.assertNotIn("judge-only", " ".join(args))
+            with self.assertRaisesRegex(ValueError, "summary override"):
+                command(ROOT, "BrowseComp", **options, summary_model="other", dry_run=True)
 
 
 if __name__ == "__main__":

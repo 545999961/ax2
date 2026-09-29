@@ -73,6 +73,7 @@ MLE_BENCH=$HOME/mle-bench \
 
 ## 可复现记录
 
-在每个结果根目录旁记录 Git commit、model、base URL、任务范围、mode、评测器 extras
-和数据 checksum，绝不要记录 API key 的值。上游版本和许可见 `SNAPSHOT.txt`、
+research 评测会在每个数据集结果根目录写入 `run_metadata.json`，并把同一记录写入每个 case JSON，
+包含 `git_commit`、`model`、`endpoint`、`task_range`、`evaluator_mode` 和
+`data_checksum`。绝不要记录 API key 的值。上游版本和许可见 `SNAPSHOT.txt`、
 `THIRD_PARTY_NOTICES.md`。

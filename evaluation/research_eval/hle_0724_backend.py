@@ -215,6 +215,8 @@ class HLE0724Backend:
             max_context_tokens=int(self.config.get("hle_max_context_tokens", 200000)),
             max_total_tokens=int(self.config.get("hle_max_total_tokens", 262144)),
             max_steps=int(self.config.get("hle_max_steps", 100)),
+            general_max_attempts=self.config.get("hle_general_max_attempts"),
+            llm_call_max_retries=int(self.config.get("hle_llm_call_max_retries", 20)),
             enable_confidence_review=bool(self.config.get('hle_enable_confidence_review', False)),
             review_threshold=float(self.config.get('hle_review_threshold', 95)),
             review_middle_threshold=float(self.config.get('hle_review_middle_threshold', 90)),

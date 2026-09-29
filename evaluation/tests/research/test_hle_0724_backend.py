@@ -6,6 +6,7 @@ import unittest
 from pathlib import Path
 from unittest import mock
 
+from arex_v2.backends.research import command
 from eval_unified import (
     build_parser,
     collect_hle_rerun_indices_and_copy_retained,
@@ -140,6 +141,15 @@ def _spec():
         id_field="id",
         evaluation_backend="hle_0724",
     )
+
+
+def _write_hle_data(root: Path) -> Path:
+    path = root / "text_items.jsonl"
+    path.write_text(
+        json.dumps({"id": "id-0", "question": "question", "answer": "answer", "image": ""}) + "\n",
+        encoding="utf-8",
+    )
+    return path
 
 
 class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
@@ -381,11 +391,14 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
             )
 
         with tempfile.TemporaryDirectory() as tmp:
+            data_path = _write_hle_data(Path(tmp))
             args = build_parser().parse_args([
                 "--datasets",
                 "HLE",
                 "--save_path",
                 tmp,
+                "--data_path",
+                str(data_path),
                 "--target_indices",
                 "0",
                 "--no-shuffle",
@@ -411,6 +424,11 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
             temp = json.loads((row_dirs[0] / "temp.json").read_text())
             self.assertEqual(temp["evaluation_backend"], "hle_0724")
             self.assertEqual(temp["score"], 1.0)
+            run_metadata = json.loads((Path(tmp) / "HLE" / "run_metadata.json").read_text())
+            self.assertEqual(run_metadata["git_commit"], run_metadata["git"]["commit"])
+            self.assertEqual(run_metadata["evaluator_mode"], "direct")
+            self.assertIn("data_checksum", run_metadata)
+            self.assertEqual(temp["run_metadata"]["data_checksum"], run_metadata["data_checksum"])
 
     async def test_run_all_maps_selected_prior_outer_result_to_backend(self):
         agent = _FakeAgentModule()
@@ -425,6 +443,7 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
 
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            data_path = _write_hle_data(root)
             source_case = root / 'source' / 'HLE' / '2026-09-17_00-00-00_row0'
             source_case.mkdir(parents=True)
             source_case.joinpath('temp.json').write_text(json.dumps({
@@ -439,6 +458,7 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
             args = build_parser().parse_args([
                 '--datasets', 'HLE',
                 '--save_path', str(root / 'output'),
+                '--data_path', str(data_path),
                 '--target_indices', '0', '--no-shuffle',
                 '--model', 'model',
                 '--sdk_base_url', 'http://agent/v1',
@@ -455,6 +475,64 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
             self.assertEqual(agent.last_args.outer_round, 2)
             self.assertEqual(agent.last_args.outer_resume['draft']['answer'], 'prior answer')
             self.assertEqual(agent.last_args.outer_resume['source_outer'], 1)
+
+    async def test_public_profile_resumes_unfinished_chain_and_publishes_only_final(self):
+        seen = []
+        interrupted = False
+
+        class Agent(_FakeAgentModule):
+            async def attempt_question(self, question, args):
+                nonlocal interrupted
+                seen.append(args.outer_round)
+                if args.outer_round == 2 and not interrupted:
+                    interrupted = True
+                    raise asyncio.CancelledError()
+                result = await super().attempt_question(question, args)
+                result['accepted_finish'] = {
+                    'answer': 'answer', 'evidences': [],
+                    'confidence': 96 if args.outer_round == 2 else 80,
+                }
+                return result
+
+        agent = Agent()
+
+        def backend_factory(config):
+            return HLE0724Backend(config, agent_module=agent, judge_module=_FakeJudgeModule())
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            data = _write_hle_data(root)
+            argv, env = command(
+                Path(__file__).resolve().parents[3], 'HLE', model='agent',
+                base_url='http://agent.test/v1', judge_model='judge',
+                judge_base_url='http://judge.test/v1', judge_api_key_env='JUDGE_API_KEY',
+                data_path=str(data), save_path=str(root / 'output'), dry_run=True,
+            )
+            with mock.patch.dict('os.environ', env), \
+                    mock.patch('eval_unified.HLE0724Backend', side_effect=backend_factory):
+                args = build_parser().parse_args(argv[2:-1])
+                # The public wrapper normally passes the input via its subprocess environment.
+                args.data_path = str(data)
+                with self.assertRaises(asyncio.CancelledError):
+                    await run_all(args)
+                self.assertFalse(list((root / 'output' / 'HLE').glob('*/temp.json')))
+                self.assertEqual(len(list((root / 'output' / '_hle_outer' / 'outer1').rglob('temp.json'))), 1)
+                await run_all(args)
+                final_paths = list((root / 'output' / 'HLE').glob('*/temp.json'))
+                self.assertEqual(len(final_paths), 1)
+                final = json.loads(final_paths[0].read_text())
+                self.assertEqual(final['hle_0724']['outer_round'], 2)
+                self.assertEqual(final['confidence'], 96)
+                self.assertEqual(seen, [1, 2, 2])
+                await run_all(args)
+                self.assertEqual(seen, [1, 2, 2])
+            self.assertEqual(agent.last_args.max_completion_tokens, 16384)
+            self.assertEqual(agent.last_args.max_context_tokens, 240000)
+            self.assertEqual(agent.last_args.llm_call_max_retries, 5)
+            self.assertEqual(agent.last_args.general_max_attempts, 10)
+            self.assertEqual(agent.last_args.temperature, 1.0)
+            self.assertTrue(agent.last_args.enable_thinking)
+            self.assertTrue(agent.last_args.preserve_thinking)
 
     async def test_per_case_outer_chain_advances_without_batch_barrier(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -648,7 +726,7 @@ class HLE0724BackendTest(unittest.IsolatedAsyncioTestCase):
 
     def test_cli_defaults_match_0724_command(self):
         args = build_parser().parse_args([])
-        root = Path(__file__).resolve().parent
+        root = Path(__file__).resolve().parents[2] / "research_eval"
         self.assertTrue(Path(DEFAULT_HLE_HARNESS_DIR).is_relative_to(root))
         self.assertTrue(Path(DEFAULT_HLE_JUDGE_SCRIPT).is_relative_to(root))
         self.assertEqual(args.hle_harness_dir, DEFAULT_HLE_HARNESS_DIR)

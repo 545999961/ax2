@@ -79,7 +79,10 @@ Use `score`, `valid_submission`, and medal/threshold fields from
 
 ## Reproducibility
 
-Record the Git commit, model, base URL, task range, mode, evaluator extras, and
-data checksum beside each result root. Never record API key values. Upstream
-commits and licenses are listed in `SNAPSHOT.txt` and
+Record the Git commit, model, base URL, task range, and evaluator mode, plus the
+data checksum beside each result root. Research runs write `run_metadata.json`
+under each dataset result root and include the same record in every case JSON.
+The record includes the explicit `git_commit`, `model`, `endpoint`,
+`task_range`, `evaluator_mode`, and `data_checksum` fields. Never record API key
+values. Upstream commits and licenses are listed in `SNAPSHOT.txt` and
 `THIRD_PARTY_NOTICES.md`.

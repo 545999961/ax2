@@ -3,13 +3,16 @@ import asyncio
 import base64
 import contextlib
 import datetime
+import hashlib
 import json
 import os
 import random
 import re
 import shutil
+import subprocess
 import time
 import traceback
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Sequence, Tuple
 
 from unified_eval.loaders import load_samples
@@ -31,6 +34,52 @@ from pretty_console import get_pretty_console
 
 
 DEFAULT_END_INDEX = 9999999999999
+
+
+def _sha256_path(path: str) -> Optional[str]:
+    """Hash a prepared input file or directory deterministically."""
+    target = Path(path).expanduser()
+    if not target.exists():
+        return None
+    digest = hashlib.sha256()
+    if target.is_file():
+        with target.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+        return digest.hexdigest()
+    for item in sorted(item for item in target.rglob("*") if item.is_file()):
+        relative = item.relative_to(target).as_posix().encode("utf-8")
+        digest.update(len(relative).to_bytes(8, "big"))
+        digest.update(relative)
+        with item.open("rb") as handle:
+            for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+                digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _git_provenance() -> Dict[str, object]:
+    repo_root = Path(__file__).resolve().parents[2]
+    try:
+        commit = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo_root, text=True,
+            stderr=subprocess.DEVNULL,
+        ).strip()
+        dirty = bool(subprocess.check_output(
+            ["git", "status", "--porcelain", "--untracked-files=no"],
+            cwd=repo_root, text=True, stderr=subprocess.DEVNULL,
+        ).strip())
+    except (OSError, subprocess.CalledProcessError):
+        commit, dirty = "unknown", None
+    return {"commit": commit, "dirty": dirty}
+
+
+def write_run_metadata(save_path: str, metadata: Dict[str, object]) -> None:
+    """Write the provenance record next to a dataset's reported scores."""
+    path = Path(save_path)
+    path.mkdir(parents=True, exist_ok=True)
+    (path / "run_metadata.json").write_text(
+        json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def import_tokenizer(tokenizer_path: str):
@@ -686,6 +735,7 @@ async def run_one_sample(
                     "trajectory": main_agent.messages,
                     "sub_traj": "",
                     "timing_summary": timing_stats.get("summary", {}),
+                    "run_metadata": config.get("run_metadata"),
                 }
                 if direct_repair_meta:
                     temp_json["direct_repair"] = direct_repair_meta
@@ -705,6 +755,7 @@ async def run_one_sample(
                     "case_duration_seconds": time.time() - case_start_time,
                     "attempt_duration_seconds": time.time() - attempt_start_time,
                     "attempt_index": attempt_idx,
+                    "run_metadata": config.get("run_metadata"),
                 }
                 if getattr(main_agent, "confidence_outer_retry_meta", None):
                     temp_origin["confidence_outer_retry"] = main_agent.confidence_outer_retry_meta
@@ -729,13 +780,13 @@ async def run_one_sample(
                         ),
                     )
             except asyncio.TimeoutError:
-                await write_error_case(spec, sample, case_dir, attempt_idx, main_agent, "CaseTimeout", f"case exceeded timeout_seconds={case_timeout_seconds}", case_start_time, attempt_start_time, case_call_stats)
+                await write_error_case(spec, sample, case_dir, attempt_idx, main_agent, "CaseTimeout", f"case exceeded timeout_seconds={case_timeout_seconds}", case_start_time, attempt_start_time, case_call_stats, config.get("run_metadata"))
                 if attempt_idx + 1 >= max_attempts:
                     pretty.case_error(case_key, "CaseTimeout", f"case exceeded timeout_seconds={case_timeout_seconds}", time.time() - case_start_time)
                 else:
                     pretty.case_retry(case_key, f"dataset={spec.name} idx={sample.idx} attempt={attempt_idx} timeout")
             except Exception as e:
-                await write_error_case(spec, sample, case_dir, attempt_idx, main_agent, type(e).__name__, str(e), case_start_time, attempt_start_time, case_call_stats)
+                await write_error_case(spec, sample, case_dir, attempt_idx, main_agent, type(e).__name__, str(e), case_start_time, attempt_start_time, case_call_stats, config.get("run_metadata"))
                 if attempt_idx + 1 >= max_attempts:
                     pretty.case_error(case_key, type(e).__name__, str(e), time.time() - case_start_time)
                 else:
@@ -766,6 +817,7 @@ async def write_error_case(
     case_start_time: float,
     attempt_start_time: float,
     case_call_stats: dict,
+    run_metadata: Optional[dict] = None,
 ):
     error_trace = traceback.format_exc()
     timing_stats = main_agent.get_timing_stats() if hasattr(main_agent, "get_timing_stats") else {}
@@ -799,6 +851,7 @@ async def write_error_case(
             "trajectory": traj,
             "sub_traj": "",
             "timing_summary": timing_stats.get("summary", {}),
+            "run_metadata": run_metadata,
             "error": {"type": error_type, "message": message, "traceback": error_trace},
         }, f, ensure_ascii=False, indent=2)
     attempt_call_stats = main_agent.get_call_stats() if hasattr(main_agent, "get_call_stats") else {}
@@ -813,6 +866,7 @@ async def write_error_case(
         "case_duration_seconds": time.time() - case_start_time,
         "attempt_duration_seconds": time.time() - attempt_start_time,
         "attempt_index": attempt_idx,
+        "run_metadata": run_metadata,
     }
     temp_origin.update(call_stats)
     with open(os.path.join(case_dir, "temp_origin.json"), "w", encoding="utf-8") as f:
@@ -890,6 +944,7 @@ async def write_hle_0724_error_case(
     message: str,
     case_start_time: float,
     attempt_start_time: float,
+    run_metadata: Optional[dict] = None,
 ) -> None:
     error_trace = traceback.format_exc()
     with open(os.path.join(case_dir, "fatal_error.txt"), "w", encoding="utf-8") as f:
@@ -922,6 +977,7 @@ async def write_hle_0724_error_case(
         "trajectory": [],
         "sub_traj": "",
         "timing_summary": {},
+        "run_metadata": run_metadata,
         "evaluation_backend": "hle_0724",
         "error": {"type": error_type, "message": message, "traceback": error_trace},
     }
@@ -939,6 +995,7 @@ async def write_hle_0724_error_case(
             "attempt_duration_seconds": time.time() - attempt_start_time,
             "attempt_index": attempt_idx,
             "evaluation_backend": "hle_0724",
+            "run_metadata": run_metadata,
         }, f, ensure_ascii=False, indent=2)
 
 
@@ -1009,6 +1066,7 @@ async def run_one_hle_0724_sample(
                     "sub_traj": "",
                     "timing_summary": {},
                     "evaluation_backend": "hle_0724",
+                    "run_metadata": config.get("run_metadata"),
                     "hle_0724": {
                         "outer_round": outer_round,
                         "confidence_review": result.get('confidence_review', {}),
@@ -1036,6 +1094,7 @@ async def run_one_hle_0724_sample(
                     "attempt_duration_seconds": time.time() - attempt_start_time,
                     "attempt_index": attempt_idx,
                     "evaluation_backend": "hle_0724",
+                    "run_metadata": config.get("run_metadata"),
                     "model_call_usage": result.get("model_call_usage", []),
                     "model_usage_summary": result.get("model_usage_summary", {}),
                 }
@@ -1067,6 +1126,7 @@ async def run_one_hle_0724_sample(
                     f"case exceeded timeout_seconds={case_timeout_seconds}",
                     case_start_time,
                     attempt_start_time,
+                    config.get("run_metadata"),
                 )
                 if attempt_idx + 1 >= max_attempts:
                     pretty.case_error(
@@ -1085,6 +1145,7 @@ async def run_one_hle_0724_sample(
                     str(exc),
                     case_start_time,
                     attempt_start_time,
+                    config.get("run_metadata"),
                 )
                 if attempt_idx + 1 >= max_attempts:
                     pretty.case_error(
@@ -1149,8 +1210,17 @@ async def run_hle_per_case_outer_chain(
     if not 2 <= start_outer <= max_outer:
         raise ValueError("invalid per-case HLE outer range")
 
+    def publish_final(result_path):
+        final_root = config.get("hle_final_save_path")
+        if final_root:
+            source = os.path.dirname(result_path)
+            destination = os.path.join(final_root, os.path.basename(source))
+            shutil.copytree(source, destination, dirs_exist_ok=True)
+
     used_steps = 0
     async with semaphore:
+        chain_started = time.monotonic()
+        timeout = float(config.get("hle_case_timeout_seconds") or 0)
         if not prior_path:
             # Recheck after acquiring the shared slot so a resumed run never
             # duplicates outer1 work completed while this task was queued.
@@ -1160,6 +1230,8 @@ async def run_hle_per_case_outer_chain(
         if not prior_path:
             outer1_config = dict(config)
             outer1_config["save_path"] = source_root
+            if total_max_steps:
+                outer1_config["hle_max_steps"] = min(per_outer_max_steps, total_max_steps)
             os.makedirs(source_root, exist_ok=True)
             print(
                 f"[HLE outer] row={sample.idx} starting missing outer1; "
@@ -1193,6 +1265,7 @@ async def run_hle_per_case_outer_chain(
                     f"[HLE outer] row={sample.idx} stopped before outer{outer}: "
                     f"confidence threshold {threshold:g} reached"
                 )
+                publish_final(prior_path)
                 return
 
             remaining_steps = (
@@ -1204,9 +1277,16 @@ async def run_hle_per_case_outer_chain(
                     f"total model-call budget {total_max_steps} reached "
                     f"(used={used_steps})"
                 )
+                publish_final(prior_path)
                 return
 
             outer_config = dict(config)
+            if timeout > 0:
+                remaining_seconds = timeout - (time.monotonic() - chain_started)
+                if remaining_seconds <= 0:
+                    publish_final(prior_path)
+                    return
+                outer_config["hle_case_timeout_seconds"] = remaining_seconds
             outer_config["hle_max_steps"] = min(per_outer_max_steps, remaining_steps)
             outer_config["save_path"] = dataset_save_path(
                 os.path.join(outer_root, f"outer{outer}"),
@@ -1242,6 +1322,7 @@ async def run_hle_per_case_outer_chain(
                 completed_outer_result = {}
             completed_outer_steps = hle_result_model_calls(completed_outer_result)
             used_steps += completed_outer_steps or outer_config["hle_max_steps"]
+        publish_final(prior_path)
 
 
 def dry_run(specs: Dict[str, DatasetSpec], args) -> None:
@@ -1529,6 +1610,38 @@ async def run_all(args) -> None:
                 "context_limit_strategy": mode_to_context_strategy(args.mode),
                 "mode": args.mode,
             })
+            run_metadata = {
+                "dataset": spec.name,
+                "git": _git_provenance(),
+                "model": args.model or "unknown",
+                "endpoint": args.sdk_base_url or "provider-default",
+                "summary_model": summary_model or "unknown",
+                "summary_endpoint": args.summary_base_url or args.sdk_base_url or "provider-default",
+                "judge_model": judge_model or "unknown",
+                "judge_endpoint": args.judge_base_url or args.summary_base_url or args.sdk_base_url or "provider-default",
+                "task_range": {
+                    "start": start_index,
+                    "end": min(end_index, len(samples)),
+                    "requested_end": end_index,
+                    "count": len(selected),
+                    "shuffle": shuffle_samples,
+                },
+                "evaluator": {
+                    "mode": args.mode,
+                    "judge_mode": args.judge_mode,
+                },
+                "data": {
+                    "path": spec.data_path,
+                    "sha256": _sha256_path(spec.data_path),
+                },
+            }
+            run_metadata.update({
+                "git_commit": run_metadata["git"]["commit"],
+                "evaluator_mode": args.mode,
+                "data_checksum": run_metadata["data"]["sha256"],
+            })
+            config["run_metadata"] = run_metadata
+            write_run_metadata(save_path, run_metadata)
             if hle_outer_resume_paths:
                 config["hle_outer_resume_paths"] = hle_outer_resume_paths
             if hle_outer_resume_source_root:
@@ -1542,6 +1655,17 @@ async def run_all(args) -> None:
                     resume_dataset_root
                 )
             if spec.evaluation_backend == "hle_0724":
+                if args.hle_per_case_outer_max > 1 and not args.hle_rerun_source_root:
+                    # A fresh public run starts outer1 itself. Store unfinished
+                    # rounds outside HLE/ so restarting cannot skip an incomplete chain.
+                    outer_root = args.hle_per_case_outer_root or os.path.join(args.save_path, "_hle_outer")
+                    config["hle_outer_resume_source_root"] = dataset_save_path(
+                        os.path.join(outer_root, "outer1"), spec.name,
+                    )
+                    config["hle_per_case_outer_root"] = outer_root
+                    config["hle_per_case_fill_missing_outer1"] = True
+                    config["hle_outer_round"] = 2
+                    config["hle_final_save_path"] = save_path
                 backend = HLE0724Backend(config)
                 hle_backends.append(backend)
                 for sample in selected:
@@ -1798,6 +1922,10 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=20,
     )
+    hle_group.add_argument("--hle-general-max-attempts", type=int, default=None,
+                           help="Use the unified client's request retry policy for HLE when specified.")
+    hle_group.add_argument("--hle-llm-call-max-retries", type=int, default=20,
+                           help="Maximum HLE solver attempts per logical call.")
     hle_group.add_argument("--hle-temperature", "--hle_temperature", dest="hle_temperature", type=float, default=1.0)
     hle_group.add_argument("--hle-top-p", "--hle_top_p", dest="hle_top_p", type=float, default=0.95)
     hle_group.add_argument("--hle-top-k", "--hle_top_k", dest="hle_top_k", type=int, default=None)

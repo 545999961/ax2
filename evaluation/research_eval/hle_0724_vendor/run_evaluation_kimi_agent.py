@@ -221,6 +221,15 @@ def build_openai_client(args=None) -> AsyncOpenAI:
         or os.environ.get("MOONSHOT_BASE_URL")
         or "https://api.moonshot.ai/v1"
     )
+    if getattr(args, "general_max_attempts", None) is not None:
+        from openai_retry_client import create_async_openai_with_retry
+
+        return create_async_openai_with_retry(
+            api_key=api_key,
+            base_url=base_url,
+            timeout=600,
+            general_max_attempts=args.general_max_attempts,
+        )
     return AsyncOpenAI(
         api_key=api_key,
         base_url=base_url,
@@ -1437,7 +1446,7 @@ async def run_agent(question: dict, args) -> dict | None:
             )
 
             response = None
-            max_retries = 20
+            max_retries = max(1, int(getattr(args, "llm_call_max_retries", 20)))
             t0 = time.time()
             for attempt in range(max_retries):
                 try:

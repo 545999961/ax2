@@ -15,9 +15,10 @@ The normal research path is still short:
 python3 evaluate.py DATASET --n 10 --save-path runs/example
 ```
 
-Use `--dry-run` first. Keep the model name, endpoint, Git commit, task range,
-mode, and data checksum beside any reported result. API keys belong in the
-shell environment and never in command-line arguments or result files.
+Use `--dry-run` first. A research run writes the model name, endpoint, Git
+commit, task range, evaluator mode, and data checksum to `run_metadata.json`
+and every case result. API keys belong in the shell environment and never in
+command-line arguments or result files.
 
 Run the repository checks from the root:
 

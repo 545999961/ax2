@@ -34,7 +34,7 @@ def review(assessment='unresolved'):
 class HLEReviewTest(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls):
-        root = Path(__file__).resolve().parents[3] / 'src' / 'research_eval' / 'hle_0724_vendor'
+        root = Path(__file__).resolve().parents[2] / 'research_eval' / 'hle_0724_vendor'
         tokenizer = SimpleNamespace(encode=lambda text: text.split())
         with mock.patch('transformers.AutoTokenizer.from_pretrained', return_value=tokenizer), \
                 mock.patch('openai.AsyncOpenAI'):

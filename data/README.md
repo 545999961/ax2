@@ -14,20 +14,20 @@ The wrapper resolves the matching directory below, checks the prepared input, an
 
 | Dataset | Loader | Input | Scoring protocol | Dataset files |
 | --- | --- | --- | --- | --- |
-| [BrowseComp](BrowseComp/) | `csv` | CSV encrypted question/answer rows | BrowseComp official judge after canary/decryption checks | `prompt.py, judge_local.py, judge_offical.py` |
-| [BrowseComp-Zh-official-en-prompt](BrowseComp-Zh-official-en-prompt/) | `json` | JSON question rows | BrowseComp-ZH Chinese official prompt/judge | `prompt.py` |
-| [DeepResearch-Bench](DeepResearch-Bench/) | `jsonl` | JSONL query rows plus criteria and reference JSONL | RACE rubric over the generated long report | `prompt.py, judge_local.py, judge_offical.py` |
-| [DeepSearch-QA](DeepSearch-QA/) | `csv` | CSV question/answer rows | DeepSearchQA official Gemini-autorater style judge | `prompt.py, judge_local.py, judge_offical.py` |
-| [DeepWideSearch](DeepWideSearch/) | `jsonl` | JSONL research questions and table references | DeepWideSearch official table evaluator | `prompt.py, judge_local.py, judge_offical.py` |
-| [GAIA-2023-validation-text-103](GAIA-2023-validation-text-103/) | `jsonl` | JSONL text-only GAIA rows | GAIA validation text rubric / WebAgent LLM judge | `prompt.py, judge_local.py, judge_offical.py` |
-| [HLE](HLE/) | `jsonl` | JSONL text-only HLE rows (image rows excluded) | 0724 HLE judge in evaluation/research_eval/hle_0724_vendor | `prompt.py, judge_local.py, judge_offical.py` |
-| [HLE-NoTool](HLE-NoTool/) | `parquet` | HLE parquet rows without tool calls | HLE official result judge | `prompt.py, judge_local.py, judge_offical.py` |
-| [MoNaCo](MoNaCo/) | `monaco_traces` | execution-trace directory | Monaco final-answer judge | `prompt.py, judge_local.py, judge_offical.py` |
-| [WideSearch-en](WideSearch-en/) | `jsonl` | WideSearch JSONL rows and gold tables | WideSearch official table evaluator | `prompt.py` |
-| [WideSearch-en-sft-eval](WideSearch-en-sft-eval/) | `jsonl` | WideSearch SFT-eval JSONL rows and gold tables | same WideSearch official table evaluator | `prompt.py` |
-| [WideSearch-zh-en-prompt](WideSearch-zh-en-prompt/) | `jsonl` | WideSearch Chinese prompt JSONL and gold tables | same WideSearch official table evaluator | `prompt.py` |
-| [WideSearch-zh-sft-eval](WideSearch-zh-sft-eval/) | `jsonl` | WideSearch Chinese SFT-eval JSONL and gold tables | same WideSearch official table evaluator | `prompt.py` |
-| [xBench-DeepSearch-2510](xBench-DeepSearch-2510/) | `csv` | CSV encrypted deep-search rows | xBench official grader | `prompt.py, judge_local.py, judge_offical.py` |
+| [BrowseComp](research/BrowseComp/) | `csv` | CSV encrypted question/answer rows | BrowseComp official judge after canary/decryption checks | `prompt.py, judge_local.py, judge_offical.py` |
+| [BrowseComp-Zh-official-en-prompt](research/BrowseComp-Zh-official-en-prompt/) | `json` | JSON question rows | BrowseComp-ZH Chinese official prompt/judge | `prompt.py` |
+| [DeepResearch-Bench](research/DeepResearch-Bench/) | `jsonl` | JSONL query rows plus criteria and reference JSONL | RACE rubric over the generated long report | `prompt.py, judge_local.py, judge_offical.py` |
+| [DeepSearch-QA](research/DeepSearch-QA/) | `csv` | CSV question/answer rows | DeepSearchQA official Gemini-autorater style judge | `prompt.py, judge_local.py, judge_offical.py` |
+| [DeepWideSearch](research/DeepWideSearch/) | `jsonl` | JSONL research questions and table references | DeepWideSearch official table evaluator | `prompt.py, judge_local.py, judge_offical.py` |
+| [GAIA-2023-validation-text-103](research/GAIA-2023-validation-text-103/) | `jsonl` | JSONL text-only GAIA rows | GAIA validation text rubric / WebAgent LLM judge | `prompt.py, judge_local.py, judge_offical.py` |
+| [HLE](research/HLE/) | `jsonl` | JSONL text-only HLE rows (image rows excluded) | 0724 HLE judge in evaluation/research_eval/hle_0724_vendor | `prompt.py, judge_local.py, judge_offical.py` |
+| [HLE-NoTool](research/HLE-NoTool/) | `parquet` | HLE parquet rows without tool calls | HLE official result judge | `prompt.py, judge_local.py, judge_offical.py` |
+| [MoNaCo](research/MoNaCo/) | `monaco_traces` | execution-trace directory | Monaco final-answer judge | `prompt.py, judge_local.py, judge_offical.py` |
+| [WideSearch-en](research/WideSearch-en/) | `jsonl` | WideSearch JSONL rows and gold tables | WideSearch official table evaluator | `prompt.py` |
+| [WideSearch-en-sft-eval](research/WideSearch-en-sft-eval/) | `jsonl` | WideSearch SFT-eval JSONL rows and gold tables | same WideSearch official table evaluator | `prompt.py` |
+| [WideSearch-zh-en-prompt](research/WideSearch-zh-en-prompt/) | `jsonl` | WideSearch Chinese prompt JSONL and gold tables | same WideSearch official table evaluator | `prompt.py` |
+| [WideSearch-zh-sft-eval](research/WideSearch-zh-sft-eval/) | `jsonl` | WideSearch Chinese SFT-eval JSONL and gold tables | same WideSearch official table evaluator | `prompt.py` |
+| [xBench-DeepSearch-2510](research/xBench-DeepSearch-2510/) | `csv` | CSV encrypted deep-search rows | xBench official grader | `prompt.py, judge_local.py, judge_offical.py` |
 
 ## Data locations
 
