@@ -1,6 +1,16 @@
-# AREX-2 评测套件
+<div align="center">
+  <img src="assets/arex-official.png" alt="AREX-2" width="430">
+  <h1>AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks</h1>
+  <p><strong>AREX Team · Beijing Academy of Artificial Intelligence (BAAI)</strong></p>
+  <p>
+    <a href="https://huggingface.co/BAAI/AREX-2"><img src="https://img.shields.io/badge/Model-Hugging%20Face-FFD21E?logo=huggingface&logoColor=111827" alt="Hugging Face 模型"></a>
+    <a href="https://arxiv.org/abs/2607.21461"><img src="https://img.shields.io/badge/Paper-arXiv-B31B1B?logo=arxiv&logoColor=white" alt="arXiv 论文"></a>
+  </p>
+</div>
 
-AREX-2 是一个面向 research、Frontier-CS 算法题和 MLE-bench Lite 的评测套件。它提供统一的命令行入口，用于准备数据、启动评测并记录复现信息。数据集和凭据由用户在本地提供，仓库只包含评测器、数据集定义和可复现命令。
+AREX-2 研究智能体能否把更多测试时迭代转化为更好的解。论文将这种能力分成两个相互关联的部分：**reflection** 使用反馈决定下一步改什么，**long-horizon execution** 让改进循环在多轮迭代中持续有效。我们从机器学习工程和算法编程中构造这类轨迹，因为这些任务的进展可以直接验证，并进一步观察这种能力向深度研究的迁移。
+
+本仓库包含论文中六个评测方向所需的评测器和数据集定义。benchmark 文件、模型输出、凭据和运行结果保留在 Git 之外；使用时只需选择数据集，并为每个结果记录模型、endpoint、任务范围、评测模式、commit 和数据 checksum。
 
 <!-- - 🌐 [项目主页](https://vectorspacelab.github.io/AREX-2/) — 研究概览和 benchmark 结果。 -->
 - 📚 [评测指南](data/README.md) — 数据准备、prompt 和各数据集评分方式。
@@ -51,10 +61,9 @@ python3 evaluate.py HLE --start-index 100 --n 20
 外层只需要选择数据集，程序会自动找到对应配置、数据路径、prompt、loader 和 scorer。默认数据目录是 `data/files/`，也可以使用 `--data-root` 或单数据集的 `--data-path`。
 
 直接选择 BrowseComp、GAIA、HLE 或 DeepSearch-QA 时，会自动使用
-`refine-equal` profile：1 并发、10 轮、每轮最多 300 次调用、总计最多 1500 次调用，
+`refine-equal` profile：1 并发、每轮最多 300 次调用、总计最多 1500 次调用，
 并启用 confidence tiered review。四个数据集使用同一套 thinking、采样、token 和 retry
-参数；unified backend 的 summary 使用推理模型，HLE 的专用 solver 也使用该模型，
-上下文和 review 调用由适配器负责；judge 由外部指定：
+参数；judge 由外部指定：
 
 ```bash
 export MODEL_API_KEY=...
@@ -105,3 +114,17 @@ MLE_BENCH=$HOME/mle-bench \
 ## 结果图
 
 ![AREX benchmark results](assets/performance/arex-v2-benchmark-results.svg)
+
+## Citation
+
+如果 AREX-2 对你的工作有帮助，请引用：
+
+```bibtex
+@article{arex2,
+  title   = {AREX-2: Advancing Self-Improving Agents through Long-Horizon Reflective Tasks},
+  author  = {AREX Team},
+  journal = {arXiv preprint arXiv:2607.21461},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2607.21461}
+}
+```

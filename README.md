@@ -76,11 +76,9 @@ python3 evaluate.py BrowseComp HLE --n 5 --save-path runs/smoke
 ```
 
 BrowseComp, GAIA, HLE, and DeepSearch-QA use the `refine-equal` profile when
-selected directly. It defaults to one concurrent case, up to ten outer rounds, a 300-call
-per-round budget with a 1,500-call total cap, confidence-tiered review, and
-the same thinking, sampling, token, and retry settings across the four
-benchmarks. Unified-backend summaries use the inference model; HLE's dedicated
-solver also uses it, with context and review calls owned by its adapter. The
+selected directly. It defaults to one concurrent case, a 300-call per-round
+budget with a 1,500-call total cap, confidence-tiered review, and the same
+thinking, sampling, token, and retry settings across the four benchmarks. The
 judge remains an explicit external service:
 
 ```bash
