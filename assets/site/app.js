@@ -1,4 +1,4 @@
-/* Title, the improvement loop and curve, section navigation, and the recorded demo. */
+/* Title, results carousel, improvement loop, section navigation, and the recorded demo. */
 (() => {
   'use strict';
 
@@ -65,6 +65,102 @@
   }).observe(document.getElementById('hero-title'));
   reducedMotion.addEventListener('change', resetTitle);
   resetTitle();
+
+  const results = document.getElementById('results');
+  const resultsViewport = results.querySelector('.results-viewport');
+  const resultSlides = [...results.querySelectorAll('[data-result-slide]')];
+  const resultCaptions = [...results.querySelectorAll('[data-result-caption]')];
+  const resultSelectors = [...results.querySelectorAll('[data-result-index]')];
+  const resultPlayback = results.querySelector('.results-playback');
+  let resultIndex = 0;
+  let resultTimer = 0;
+  let resultsVisible = false;
+  let resultsHovered = false;
+  let resultsFocusPaused = false;
+  let resultsRotating = !reducedMotion.matches;
+
+  const scheduleResults = () => {
+    clearTimeout(resultTimer);
+    resultPlayback.classList.toggle('is-paused', !resultsRotating);
+    const label = resultsRotating ? 'Pause automatic figure rotation' : 'Start automatic figure rotation';
+    resultPlayback.setAttribute('aria-label', label);
+    resultPlayback.title = label;
+    if (!resultsRotating || !resultsVisible || resultsHovered || resultsFocusPaused || document.hidden) return;
+    resultTimer = setTimeout(() => {
+      const next = (resultIndex + 1) % resultSlides.length;
+      const nextImages = [...resultSlides[next].querySelectorAll('img')];
+      // Keep the current figure visible until every image in the next slide is ready.
+      if (nextImages.every(image => image.complete && image.naturalWidth)) showResult(next);
+      scheduleResults();
+    }, 4000);
+  };
+  const showResult = index => {
+    resultIndex = index;
+    results.dataset.activeResult = String(index);
+    resultSlides.forEach((slide, i) => {
+      const active = i === index;
+      slide.classList.toggle('is-active', active);
+      slide.setAttribute('aria-hidden', String(!active));
+      slide.inert = !active;
+      resultCaptions[i].classList.toggle('is-active', active);
+      resultCaptions[i].setAttribute('aria-hidden', String(!active));
+      resultSelectors[i].setAttribute('aria-pressed', String(active));
+    });
+    resultsViewport.scrollLeft = 0;
+  };
+  const selectResult = index => {
+    resultsRotating = false;
+    showResult(index);
+    scheduleResults();
+  };
+  resultSelectors.forEach((button, index) => {
+    button.addEventListener('click', () => selectResult(index));
+    button.addEventListener('keydown', event => {
+      const directions = {ArrowLeft: -1, ArrowRight: 1};
+      if (!(event.key in directions)) return;
+      event.preventDefault();
+      const next = (index + directions[event.key] + resultSlides.length) % resultSlides.length;
+      resultSelectors[next].focus();
+      selectResult(next);
+    });
+  });
+  resultPlayback.addEventListener('click', () => {
+    resultsRotating = !resultsRotating;
+    if (resultsRotating) resultsFocusPaused = false;
+    scheduleResults();
+  });
+  results.addEventListener('pointerenter', event => {
+    if (event.pointerType === 'touch') return;
+    resultsHovered = true;
+    scheduleResults();
+  });
+  results.addEventListener('pointerleave', () => {
+    resultsHovered = false;
+    scheduleResults();
+  });
+  resultsViewport.addEventListener('pointerdown', () => {
+    resultsRotating = false;
+    scheduleResults();
+  });
+  results.addEventListener('focusin', () => {
+    resultsFocusPaused = true;
+    scheduleResults();
+  });
+  results.addEventListener('focusout', () => setTimeout(() => {
+    if (!results.contains(document.activeElement)) resultsFocusPaused = false;
+    scheduleResults();
+  }, 0));
+  document.addEventListener('visibilitychange', scheduleResults);
+  reducedMotion.addEventListener('change', () => {
+    if (reducedMotion.matches) resultsRotating = false;
+    scheduleResults();
+  });
+  new IntersectionObserver(entries => {
+    resultsVisible = entries[0].isIntersecting && entries[0].intersectionRatio >= .25;
+    scheduleResults();
+  }, {threshold: [0, .25]}).observe(resultsViewport);
+  results.querySelector('.results-controls').hidden = false;
+  scheduleResults();
 
   const progressPlot = document.querySelector('.progress-illustration');
   const curve = document.getElementById('progress-curve');
