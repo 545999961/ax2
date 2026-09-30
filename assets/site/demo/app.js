@@ -56,6 +56,7 @@
   const demoVideo = $('demoVideo');
   let raf = 0, lastFrame = 0, toastTimer = 0, positions = new Map();
   let embeddedPlaybackRequested = false;
+  let reportedView = null;
   if (capture) document.body.classList.add('capture');
   const stageAt = time => time < CONFIG.timing.methodStart ? 'statement' : time < START ? 'approach' : 'trajectory';
   const actualAt = time => playbackScale.inverse(clamp((time - START) / (END - START), 0, 1) * playbackScale.length);
@@ -307,11 +308,18 @@
       if (active) nav.setAttribute('aria-current','step'); else nav.removeAttribute('aria-current');
     }
     $('videoScene').hidden = !videoVisible;
-    $('videoTab').classList.toggle('active',videoVisible);
-    if (videoVisible) $('videoTab').setAttribute('aria-current','page'); else $('videoTab').removeAttribute('aria-current');
+    $('interactiveNav').hidden = videoVisible;
+    for (const [id,active] of [['interactiveTab',!videoVisible],['videoTab',videoVisible]]) {
+      $(id).classList.toggle('active',active);
+      if (active) $(id).setAttribute('aria-current','page'); else $(id).removeAttribute('aria-current');
+    }
     document.querySelector('.narrative-line').hidden = videoVisible;
     document.querySelector('.playback-bar').hidden = videoVisible;
     document.querySelector('.app').classList.toggle('is-video-view',videoVisible);
+    if (reportedView !== state.view) {
+      reportedView = state.view;
+      parent.postMessage({type:'arex-demo:view',view:state.view},location.origin === 'null' ? '*' : location.origin);
+    }
     if (videoVisible) return;
     const best = bestAt(state.actual);
     $('bestScore').textContent = formatScore(best);
@@ -466,6 +474,12 @@
 
   $('playButton').addEventListener('click',play);
   $('restartButton').addEventListener('click',()=>{stopPlayback();state.mode='playback';setTime(START,true);updateFocusButton();});
+  $('interactiveTab').addEventListener('click',()=>{
+    if (state.view === 'replay') return;
+    demoVideo.pause();
+    state.view='replay';
+    render();
+  });
   $('videoTab').addEventListener('click',()=>{
     stopPlayback();
     state.view='video';

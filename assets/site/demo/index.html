@@ -13,8 +13,11 @@
 <div class="app">
 
 <div class="demo-deck" id="demoDeck">
-<nav aria-label="Demo sections" class="stage-nav">
-<div class="stage-links"><button data-stage="statement">The task</button><button data-stage="approach">The method</button><button class="active" data-stage="trajectory">The trajectory</button><button aria-controls="videoScene" id="videoTab">Demo video</button></div>
+<nav aria-label="Demo views" class="stage-nav demo-view-nav">
+<div class="stage-links"><button aria-controls="interactiveNav statementScene approachScene trajectoryScene" aria-current="page" class="active" id="interactiveTab">Interactive Demo</button><button aria-controls="videoScene" id="videoTab">Demo Video</button></div>
+</nav>
+<nav aria-label="Interactive demo sections" class="stage-nav" id="interactiveNav">
+<div class="stage-links"><button data-stage="statement">The task</button><button data-stage="approach">The method</button><button class="active" data-stage="trajectory">The trajectory</button></div>
 <div class="stage-actions"><span class="reconstruction-label">Recorded run · Problem 164</span></div>
 </nav>
 <main class="workspace">

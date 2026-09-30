@@ -225,10 +225,12 @@
   const demoView = document.getElementById('demo-view');
   const demo = document.getElementById('run-demo');
   const demoToolbar = document.querySelector('.demo-toolbar');
+  const demoViewLabel = document.getElementById('demo-view-label');
   const precedingContent = [...document.querySelectorAll('#main-content > :not(#demo), .site-footer')];
   const targetOrigin = location.origin === 'null' ? '*' : location.origin;
   let frame = 0;
   let demoOpen = false;
+  let demoScrollDocument = null;
 
   root.classList.add('demo-view-enabled');
   demoView.inert = true;
@@ -240,13 +242,39 @@
     const height = Math.max(580, innerHeight - demoToolbar.offsetHeight - 44);
     demo.contentWindow?.postMessage({type: 'arex-demo:viewport', height}, targetOrigin);
   };
+  // While the demo slides into view, scroll the page instead of the iframe.
+  const bindDemoScroll = () => {
+    const frameDocument = demo.contentDocument;
+    if (!frameDocument || frameDocument === demoScrollDocument) return;
+    demoScrollDocument = frameDocument;
+    frameDocument.addEventListener('wheel', event => {
+      if (demoOpen || event.ctrlKey || !event.deltaY) return;
+      event.preventDefault();
+      const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1;
+      scrollBy({top: event.deltaY * unit, behavior: 'instant'});
+    }, {passive: false});
+    let touchY = null;
+    frameDocument.addEventListener('touchstart', event => {
+      touchY = !demoOpen && event.touches.length === 1 ? event.touches[0].screenY : null;
+    }, {passive: true});
+    frameDocument.addEventListener('touchmove', event => {
+      if (touchY === null || event.touches.length !== 1) { touchY = null; return; }
+      const nextY = event.touches[0].screenY;
+      const delta = touchY - nextY;
+      touchY = nextY;
+      event.preventDefault();
+      (demoOpen ? demoView : window).scrollBy({top: delta, behavior: 'instant'});
+    }, {passive: false});
+    const endTouch = () => { touchY = null; };
+    frameDocument.addEventListener('touchend', endTouch, {passive: true});
+    frameDocument.addEventListener('touchcancel', endTouch, {passive: true});
+  };
   const setDemoOpen = open => {
     if (open === demoOpen) return;
     const hadDemoFocus = demoView.contains(document.activeElement);
     demoOpen = open;
     root.classList.toggle('demo-is-open', open);
     header.inert = open;
-    demoView.inert = !open;
     precedingContent.forEach(section => { section.inert = open; });
     if (open) {
       demoView.scrollTop = 0;
@@ -265,8 +293,12 @@
     root.style.setProperty('--demo-offset', `${demoOffset}px`);
     root.style.setProperty('--demo-progress', String(demoProgress));
     root.style.setProperty('--page-opacity', String(1 - demoProgress));
-    root.classList.toggle('demo-is-visible', demoProgress > 0);
+    const wasVisible = root.classList.contains('demo-is-visible');
+    const visible = demoProgress > 0;
+    root.classList.toggle('demo-is-visible', visible);
+    demoView.inert = !visible;
     setDemoOpen(demoOffset < 1);
+    if (wasVisible && !visible) syncDemoPlayback();
 
     let active = demoOpen ? demoSection : undefined;
     if (!demoOpen) {
@@ -288,9 +320,12 @@
   });
   window.addEventListener('load', schedule);
   window.addEventListener('hashchange', schedule);
-  demo.addEventListener('load', () => { sizeDemo(); syncDemoPlayback(); });
+  demo.addEventListener('load', () => { bindDemoScroll(); sizeDemo(); syncDemoPlayback(); });
   window.addEventListener('message', event => {
     if (event.source !== demo.contentWindow || event.origin !== location.origin) return;
+    if (event.data?.type === 'arex-demo:view' && ['replay','video'].includes(event.data.view)) {
+      demoViewLabel.textContent = event.data.view === 'video' ? 'Demo video' : 'Interactive demo';
+    }
     if (event.data?.type === 'arex-demo:size' && Number.isFinite(event.data.height)) {
       demo.style.height = `${Math.max(320, Math.min(2400, event.data.height))}px`;
       schedule();
@@ -298,6 +333,7 @@
   });
   // Figures and web fonts can change section positions without a window resize.
   new ResizeObserver(schedule).observe(document.getElementById('main-content'));
+  bindDemoScroll();
   sizeDemo();
   update();
 })();
