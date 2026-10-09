@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# GAIA text validation: one dataset, shared refine-equal evaluation profile.
+# GAIA text validation: one dataset, shared research evaluation settings.
 
 set -euo pipefail
 

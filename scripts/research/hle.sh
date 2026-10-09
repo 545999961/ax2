@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HLE text items: one dataset, shared refine-equal evaluation profile.
+# HLE text items: one dataset, shared research evaluation settings.
 
 set -euo pipefail
 

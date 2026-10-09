@@ -76,8 +76,8 @@ python3 evaluate.py HLE --start-index 100 --n 20
 python3 evaluate.py BrowseComp HLE --n 5 --save-path runs/smoke
 ```
 
-BrowseComp, GAIA, HLE, and DeepSearch-QA use the `refine-equal` profile when
-selected directly. It defaults to one concurrent case, a 300-call per-round
+BrowseComp, GAIA, HLE, and DeepSearch-QA share default evaluation settings.
+These include one concurrent case, a 300-call per-round
 budget with a 1,500-call total cap, confidence-tiered review, and the same
 thinking, sampling, token, and retry settings across the four benchmarks. The
 judge remains an explicit external service:
@@ -94,7 +94,7 @@ python3 evaluate.py BrowseComp --n 10 \
 ```
 
 See [the shared parameter table](docs/evaluation/configuration.md#shared-research-profile)
-for the exact values. `--profile default` opts out of this profile;
+for the exact values. `--profile default` opts out of these shared settings;
 `--dry-run` shows the expanded command without calling a service.
 
 Prepare the four datasets with a built-in download recipe:

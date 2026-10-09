@@ -33,7 +33,7 @@ run_research_dataset() {
         fi
     done
 
-    # Defaults mirror the maintained refine-equal profile. The profile is the
+    # Defaults mirror the shared research configuration. The profile is the
     # single source of truth for generation, review, budget, and retry flags;
     # keeping them here as comments makes the wrapper's contract visible.
     # concurrency=1; outer rounds=10; calls per round=300; total calls=1500
@@ -81,7 +81,7 @@ run_research_dataset() {
 
     local -a command=(
         python3 "$AREX_REPO_ROOT/evaluate.py" "$dataset"
-        --profile refine-equal
+        --profile research
         --concurrency "$concurrency"
         --n "$num_tasks"
         --start-index "$start_index"

@@ -61,8 +61,8 @@ python3 evaluate.py HLE --start-index 100 --n 20
 
 外层只需要选择数据集，程序会自动找到对应配置、数据路径、prompt、loader 和 scorer。默认数据目录是 `data/files/`，也可以使用 `--data-root` 或单数据集的 `--data-path`。
 
-直接选择 BrowseComp、GAIA、HLE 或 DeepSearch-QA 时，会自动使用
-`refine-equal` profile：1 并发、每轮最多 300 次调用、总计最多 1500 次调用，
+BrowseComp、GAIA、HLE 和 DeepSearch-QA 默认采用统一的评测配置：
+1 并发、每轮最多 300 次调用、总计最多 1500 次调用，
 并启用 confidence tiered review。四个数据集使用同一套 thinking、采样、token 和 retry
 参数；judge 由外部指定：
 
@@ -78,7 +78,7 @@ python3 evaluate.py BrowseComp --n 10 \
 ```
 
 完整参数见[配置说明](docs/evaluation/configuration.zh-CN.md#四个核心数据集的默认参数)。
-`--profile default` 可以关闭这组 profile；`--dry-run` 会打印展开后的完整命令，不会调用服务。
+`--profile default` 可以关闭这组共享配置；`--dry-run` 会打印展开后的完整命令，不会调用服务。
 
 有下载配方的数据集：
 

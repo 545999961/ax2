@@ -55,7 +55,7 @@ def command(
             ("key environment", summary_api_key_env, api_key_env),
         ):
             if value and value != expected:
-                raise ValueError(f"refine-equal uses the inference {label} for summary; remove the summary override")
+                raise ValueError(f"profile {selected_profile.name} uses the inference {label} for summary; remove the summary override")
         summary_model, summary_base_url, summary_api_key_env = model, base_url, api_key_env
     root = resolve_data_root(data_root)
     paths = dataset_paths(root, selected, use_legacy=not (data_root or env.get("AREX_DATA_ROOT")))
@@ -75,7 +75,7 @@ def command(
         if selected_profile is not None:
             if not judge_model or not judge_base_url or not judge_api_key_env:
                 raise ValueError(
-                    "refine-equal requires an externally specified judge: "
+                    f"profile {selected_profile.name} requires an externally specified judge: "
                     "--judge-model, --judge-base-url, and --judge-api-key-env"
                 )
             if not env.get(judge_api_key_env):

@@ -17,11 +17,11 @@ evaluate DATASET [DATASET ...]
   --data-root PATH           准备好的数据根目录（默认 ./data/files）
   --save-path PATH           结果根目录（默认 runs/<timestamp>）
   --concurrency N            最大并发题数（profile 默认 1；其他情况为 4）
-  --profile auto|default|refine-equal
+  --profile auto|default|research
   --extra FLAG               评测器高级参数，可重复
 ```
 
-例如，直接选择数据集时会自动采用四个核心 benchmark 共用的 `refine-equal` profile：
+例如，四个核心研究基准会自动采用统一的评测配置：
 
 ```bash
 python3 evaluate.py BrowseComp --start-index 100 --n 20 \
@@ -46,7 +46,7 @@ python3 evaluate.py BrowseComp --start-index 100 --n 20 \
 | `AREX_MODEL_NAME` | 默认 model | 所有真实 research 评测 |
 | `AREX_BASE_URL` | 默认模型端点 | 自定义端点时 |
 | `AREX_TOKENIZER_PATH` | 本地 token 统计 | unified research 数据集 |
-| `JUDGE_API_KEY`（或 `--judge-api-key-env`） | 外部 judge SDK | `refine-equal` profile |
+| `JUDGE_API_KEY`（或 `--judge-api-key-env`） | 外部 judge SDK | 共享研究评测配置 |
 | `SERPER_API_KEY` | `search`、`google_scholar` | research 工具 |
 | `JINA_API_KEY` | `visit` | 私有或限流的 Jina |
 | `HF_TOKEN` | Hugging Face 下载 | HLE、GAIA 准备 |
@@ -74,8 +74,9 @@ python3 evaluate.py BrowseComp --start-index 100 --n 20 \
 
 ## 四个核心数据集的默认参数
 
-`auto` 会为 BrowseComp、GAIA-2023-validation-text-103、HLE 和 DeepSearch-QA
-选择 `refine-equal`：1 并发、10 轮、每轮最多 300 次调用、总计最多 1500 次调用、confidence
+默认的 `--profile auto` 会为 BrowseComp、GAIA-2023-validation-text-103、HLE 和 DeepSearch-QA
+采用统一的评测配置，也可以用 `--profile research` 显式选择。默认参数为：
+1 并发、最多 10 轮、每轮最多 300 次调用、总计最多 1500 次调用、confidence
 tiered review，以及相同的 thinking/采样/token/retry 设置。unified backend 的 summary 使用推理模型；
 HLE 的专用 solver 也使用推理模型，但上下文和 review 调用由适配器负责。
 judge 必须通过 `--judge-model`、`--judge-base-url` 和 `--judge-api-key-env` 从外部指定；

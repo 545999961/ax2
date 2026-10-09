@@ -4,7 +4,7 @@ Each script in this directory evaluates one research benchmark through the
 repository-level `evaluate.py` entrypoint. The wrappers select the dataset;
 the evaluator keeps the prompts, tools, scoring contracts, and run metadata.
 
-The four scripts use the same `refine-equal` profile. Its fixed settings are:
+The four scripts share the same evaluation settings:
 
 | Setting | Value |
 | --- | ---: |

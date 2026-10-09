@@ -88,9 +88,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     p.add_argument(
         "--profile",
-        choices=["auto", "default", "refine-equal"],
+        choices=["auto", "default", "research"],
         default="auto",
-        help="named benchmark configuration (auto enables refine-equal for the four headline datasets)",
+        help="benchmark configuration (auto applies shared settings to the four core research datasets)",
     )
     p.add_argument("--model", "--model-name", dest="model", default=os.environ.get("AREX_MODEL_NAME", ""))
     p.add_argument(

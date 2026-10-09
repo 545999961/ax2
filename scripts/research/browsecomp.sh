@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# BrowseComp: one dataset, shared refine-equal evaluation profile.
+# BrowseComp: one dataset, shared research evaluation settings.
 
 set -euo pipefail
 

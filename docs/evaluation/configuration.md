@@ -18,12 +18,12 @@ evaluate DATASET [DATASET ...]
   --data-root PATH           prepared data root (default: ./data/files)
   --save-path PATH           result root (default: runs/<timestamp>)
   --concurrency N            maximum concurrent cases (profile default: 1; otherwise 4)
-  --profile auto|default|refine-equal
+  --profile auto|default|research
   --extra FLAG               evaluator-specific flag; repeat it
 ```
 
-For example, the headline research datasets use the shared `refine-equal`
-profile automatically:
+For example, the four core research datasets use shared evaluation settings
+automatically:
 
 ```bash
 python3 evaluate.py BrowseComp --start-index 100 --n 20 \
@@ -49,7 +49,7 @@ that the selected data exists before launching the evaluator.
 | `AREX_MODEL_NAME` | default model | every real research run |
 | `AREX_BASE_URL` | default model endpoint | when using a custom endpoint |
 | `AREX_TOKENIZER_PATH` | local token counting | unified research datasets |
-| `JUDGE_API_KEY` (or `--judge-api-key-env`) | external judge SDK | `refine-equal` profile |
+| `JUDGE_API_KEY` (or `--judge-api-key-env`) | external judge SDK | shared research configuration |
 | `SERPER_API_KEY` | `search`, `google_scholar` | research tools |
 | `JINA_API_KEY` | `visit` | private or rate-limited Jina |
 | `HF_TOKEN` | Hugging Face downloader | HLE and GAIA preparation |
@@ -80,8 +80,9 @@ file to every dataset.
 
 ## Shared research profile
 
-`auto` selects `refine-equal` for BrowseComp, GAIA-2023-validation-text-103,
-HLE, and DeepSearch-QA. The profile uses one concurrent case, ten outer rounds,
+The default `--profile auto` applies shared evaluation settings to BrowseComp,
+GAIA-2023-validation-text-103, HLE, and DeepSearch-QA. Use `--profile research`
+to select this configuration explicitly. It uses one concurrent case, ten outer rounds,
 300 calls per round, a 1,500-call total cap, confidence-tiered review, shared
 thinking/sampling/token/retry settings, and an external judge. Summary requests
 use the inference model in the unified backend. HLE's dedicated solver also uses

@@ -1,9 +1,8 @@
-"""Named research-evaluation profiles exposed by the checkout CLI.
+"""Shared evaluation settings for the four core research benchmarks.
 
-The ``refine-equal`` profile shares the generation settings of the 0919
-BrowseComp runner, with one concurrent case by default. Keeping values here makes the
-subprocess command inspectable and prevents the four headline benchmarks from
-silently drifting apart.
+The ``research`` profile uses one concurrent case by default. Keeping values
+here makes the subprocess command inspectable and keeps generation settings,
+call budgets, and retries consistent across benchmarks.
 """
 
 from __future__ import annotations
@@ -11,7 +10,7 @@ from __future__ import annotations
 from dataclasses import dataclass, replace
 
 
-REFINE_EQUAL_DATASETS = frozenset(
+RESEARCH_PROFILE_DATASETS = frozenset(
     {"BrowseComp", "GAIA-2023-validation-text-103", "HLE", "DeepSearch-QA"}
 )
 
@@ -40,8 +39,8 @@ class ResearchProfile:
     max_attempts: int
 
 
-REFINE_EQUAL = ResearchProfile(
-    name="refine-equal",
+RESEARCH_PROFILE = ResearchProfile(
+    name="research",
     mode="direct",  # HLE uses its dedicated harness; other targets override this.
     concurrency=1,
     max_outer_rounds=10,
@@ -74,20 +73,20 @@ def select_profile(requested: str, datasets: list[str]) -> ResearchProfile | Non
     requested = (requested or "auto").strip().lower()
     selected = set(datasets)
     if requested in {"", "auto"}:
-        if not selected.intersection(REFINE_EQUAL_DATASETS):
+        if not selected.intersection(RESEARCH_PROFILE_DATASETS):
             return None
-        if not selected.issubset(REFINE_EQUAL_DATASETS):
+        if not selected.issubset(RESEARCH_PROFILE_DATASETS):
             raise ValueError("Run core and other datasets separately, or use --profile default")
     elif requested in {"default", "none"}:
         return None
-    elif requested != "refine-equal":
-        raise ValueError("--profile must be one of: auto, default, refine-equal")
-    elif not selected.issubset(REFINE_EQUAL_DATASETS):
-        unsupported = sorted(selected - REFINE_EQUAL_DATASETS)
+    elif requested != "research":
+        raise ValueError("--profile must be one of: auto, default, research")
+    elif not selected.issubset(RESEARCH_PROFILE_DATASETS):
+        unsupported = sorted(selected - RESEARCH_PROFILE_DATASETS)
         raise ValueError(
-            "profile refine-equal only supports BrowseComp, GAIA, HLE, and "
+            "profile research only supports BrowseComp, GAIA, HLE, and "
             f"DeepSearch-QA (unsupported: {', '.join(unsupported)})"
         )
 
     mode = "direct" if selected == {"HLE"} else "refine_summary"
-    return replace(REFINE_EQUAL, mode=mode)
+    return replace(RESEARCH_PROFILE, mode=mode)

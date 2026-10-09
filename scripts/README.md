@@ -12,8 +12,8 @@ mle/           MLE-bench Lite prepare, run, grade, and summary wrappers
 ```
 
 The four headline research datasets have dedicated wrappers in
-`research/`. Each wrapper selects one dataset and the shared `refine-equal`
-profile, so the command exposes the benchmark choice while keeping the
+`research/`. Each wrapper selects one dataset and applies shared evaluation
+settings, so the command exposes the benchmark choice while keeping the
 evaluation settings in one maintained place. See
 [`research/README.md`](research/README.md) for the fixed settings and the
 model, endpoint, judge, task-range, and output variables.

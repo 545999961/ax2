@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# DeepSearch-QA: one dataset, shared refine-equal evaluation profile.
+# DeepSearch-QA: one dataset, shared research evaluation settings.
 
 set -euo pipefail
 
